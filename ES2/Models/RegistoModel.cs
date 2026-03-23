@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace ES2.Models;
@@ -15,6 +16,11 @@ public class RegistoModel
     [Required(ErrorMessage = "A password é obrigatória.")]
     [DataType(DataType.Password)]
     public string Password { get; set; }
+    
+    [Required(ErrorMessage = "O telemóvel é obrigatório.")]
+    [RegularExpression(@"^\d{9}$", ErrorMessage = "O telemóvel deve ter exatamente 9 dígitos.")]
+    [DataType(DataType.PhoneNumber)]
+    public string Telemovel { get; set; }
     
     [Required(ErrorMessage = "Escreva o seu código postal.")]
     public string CodigoPostalInput { get; set; }

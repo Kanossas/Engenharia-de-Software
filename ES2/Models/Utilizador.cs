@@ -16,7 +16,7 @@ public partial class Utilizador
 
     public string? Email { get; set; }
 
-    public BitArray? Telemovel { get; set; }
+    public string? Telemovel { get; set; }
 
     public string? Morada { get; set; }
 

@@ -51,6 +51,7 @@ public class RegistoController : Controller
                 Nome = model.Nome,
                 Email = model.Email,
                 Password = model.Password,
+                Telemovel = model.Telemovel,
                 TipoUti=2,
                 IdCodPostal = idCodPostalFinal
             };
