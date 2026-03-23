@@ -47,4 +47,10 @@ public class UtilizadorRepository : IUtilizadorRepository
             .Where(r => r.IdEvento == eventoId && !r.IsCancelado)
             .Select(r => r.IdUtiNavigation)
             .ToListAsync();
+    
+    // Verifica se algum outro utilizador (que não seja o próprio) já usa este email
+    // excludeId = o ID do utilizador que está a editar, para não se comparar consigo mesmo
+    public async Task<bool> EmailJaExisteAsync(string email, int excludeId) =>
+        await _context.Utilizadores
+            .AnyAsync(u => u.Email == email && u.IdUti != excludeId);
 }

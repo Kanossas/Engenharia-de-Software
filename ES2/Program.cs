@@ -1,5 +1,7 @@
 using ES2.Data;
 using ES2.Models;
+using ES2.Repositories;
+using ES2.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +13,10 @@ builder.Services.AddControllersWithViews();
 // Registar o DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Isto diz ao .NET: "quando alguém pedir IUtilizadorRepository, usa UtilizadorRepository"
+builder.Services.AddScoped<IUtilizadorRepository, UtilizadorRepository>();
+
 
 var app = builder.Build();
 

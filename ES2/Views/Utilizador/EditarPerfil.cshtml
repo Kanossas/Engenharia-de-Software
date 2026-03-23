@@ -1,0 +1,42 @@
+@model ES2.DTOs.EditarPerfilDto
+
+@{
+    ViewData["Title"] = "Editar Perfil";
+    var utilizadorId = ViewBag.UtilizadorId;
+}
+
+<h2>Editar Perfil</h2>
+
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Sucesso"]
+    </div>
+}
+
+<form asp-action="EditarPerfil" asp-route-id="@utilizadorId" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Nome" class="form-label">Nome</label>
+        <input asp-for="Nome" class="form-control" />
+        <span asp-validation-for="Nome" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Telemovel" class="form-label">Telemóvel</label>
+        <input asp-for="Telemovel" class="form-control" />
+        <span asp-validation-for="Telemovel" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Alterações</button>
+    <a href="javascript:history.back()" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
