@@ -1,0 +1,49 @@
+@model ES2.Models.Utilizador
+
+@{
+    ViewData["Title"] = "O Meu Perfil";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Informações da Conta</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 30%">Nome:</th>
+                            <td>@Model.Nome</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>@Model.Email</td>
+                        </tr>
+                        <tr>
+                            <th>Telemóvel:</th>
+                            <td>@(string.IsNullOrEmpty(Model.Telemovel) ? "Não definido" : Model.Telemovel)</td>
+                        </tr>
+                        <tr>
+                            <th>Tipo:</th>
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    @(Model.TipoUti == 1 ? "Administrador" : "Utilizador Comum")
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="card-footer text-end">
+                    <a asp-controller="Utilizador" asp-action="EditarPerfil" asp-route-id="@Model.IdUti" class="btn btn-warning">
+                        Editar Perfil
+                    </a>
+    
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Voltar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

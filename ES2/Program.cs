@@ -7,6 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configura o sistema de autenticação por Cookies
+builder.Services.AddAuthentication("CookieAuth")
+    .AddCookie("CookieAuth", config =>
+    {
+        config.Cookie.Name = "UserLoginCookie"; // Nome do ficheiro temporário no browser
+        config.LoginPath = "/Login/Index";      // Se alguém tentar entrar sem login, vai para aqui
+        config.AccessDeniedPath = "/Home/Index"; 
+    });
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -29,6 +38,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapControllerRoute(

@@ -1,17 +1,20 @@
 @model ES2.DTOs.EditarPerfilDto
 
 @{
-    ViewData["Title"] = "Editar Perfil";
-    var utilizadorId = ViewBag.UtilizadorId;
+ViewData["Title"] = "Editar Perfil";
+var utilizadorId = ViewBag.UtilizadorId;
 }
 
 <h2>Editar Perfil</h2>
 
 @if (TempData["Sucesso"] != null)
 {
-    <div class="alert alert-success">
-        @TempData["Sucesso"]
-    </div>
+<div id="success-alert" class="alert alert-success">
+    @TempData["Sucesso"]
+    <span style="margin-left: 10px; opacity: 0.8; font-size: 0.9em;">
+            (A redirecionar em <b id="seconds">5</b>s...)
+        </span>
+</div>
 }
 
 <form asp-action="EditarPerfil" asp-route-id="@utilizadorId" method="post">
@@ -40,3 +43,23 @@
     <button type="submit" class="btn btn-primary">Guardar Alterações</button>
     <a href="javascript:history.back()" class="btn btn-secondary ms-2">Cancelar</a>
 </form>
+
+@section Scripts {
+@if (TempData["Sucesso"] != null)
+{
+<script>
+    let seconds = 5;
+    const secondsElement = document.getElementById("seconds");
+
+    const timer = setInterval(() => {
+        seconds--;
+        if (secondsElement) secondsElement.innerText = seconds;
+
+        if (seconds <= 0) {
+            clearInterval(timer);
+            window.location.href = '/'; // Volta para a página inicial
+        }
+    }, 1000);
+</script>
+}
+}

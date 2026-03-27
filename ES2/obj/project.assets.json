@@ -2979,19 +2979,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Utilizador\\.nuget\\packages\\": {}
+    "C:\\Users\\hugom\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Utilizador\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj",
+      "projectUniqueName": "C:\\Users\\hugom\\Documents\\GitHub\\Engenharia-de-Software\\ES2\\ES2.csproj",
       "projectName": "ES2",
-      "projectPath": "C:\\Users\\Utilizador\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj",
-      "packagesPath": "C:\\Users\\Utilizador\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Utilizador\\RiderProjects\\Engenharia-de-Software\\ES2\\obj\\",
+      "projectPath": "C:\\Users\\hugom\\Documents\\GitHub\\Engenharia-de-Software\\ES2\\ES2.csproj",
+      "packagesPath": "C:\\Users\\hugom\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\hugom\\Documents\\GitHub\\Engenharia-de-Software\\ES2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Utilizador\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\hugom\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
