@@ -7,6 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configura o sistema de autenticação por Cookies
+builder.Services.AddAuthentication("CookieAuth")
+    .AddCookie("CookieAuth", config =>
+    {
+        config.Cookie.Name = "UserLoginCookie"; // Nome do ficheiro temporário no browser
+        config.LoginPath = "/Login/Index";      // Se alguém tentar entrar sem login, vai para aqui
+        config.AccessDeniedPath = "/Home/Index"; 
+    });
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -16,6 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Isto diz ao .NET: "quando alguém pedir IUtilizadorRepository, usa UtilizadorRepository"
 builder.Services.AddScoped<IUtilizadorRepository, UtilizadorRepository>();
+builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 
 
 var app = builder.Build();
@@ -29,6 +39,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapControllerRoute(

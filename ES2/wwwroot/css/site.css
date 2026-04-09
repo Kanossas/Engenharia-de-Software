@@ -1,31 +1,143 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
+/* --- CONFIGURAÇÃO GERAL --- */
 body {
+  background-color: #212130;
+  color: #ffffff;
   margin-bottom: 60px;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* --- TÍTULOS (ENTRAR / REGISTO) --- */
+h1, h2, h3, h4, h5, h6 {
+  color: #ffffff !important;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+/* --- NAVBAR --- */
+.navbar {
+  background-color: #1a1a26 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.navbar-brand, .navbar-nav .nav-link {
+  color: #ffffff !important;
+}
+
+/* --- DROPBOX (DROPDOWN) --- */
+.dropdown-menu {
+  background-color: #1c1c2b !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 0;
+}
+
+.dropdown-divider { display: none !important; }
+
+.dropdown-item {
+  color: #ffffff !important;
+  background: transparent !important;
+  transition: transform 0.3s ease, text-shadow 0.3s ease;
+  display: inline-block;
+  width: 100%;
+}
+
+.dropdown-item:hover {
+  background-color: transparent !important;
+  transform: scale(1.08);
+}
+
+.dropdown-item-details { color: #8c78b0 !important; font-weight: 600; }
+.dropdown-item-details:hover { text-shadow: 0 0 8px rgba(140, 120, 176, 0.6); }
+
+.dropdown-item-logout { color: #ffb3b3 !important; font-weight: 600; }
+.dropdown-item-logout:hover { text-shadow: 0 0 8px rgba(255, 179, 179, 0.6); }
+
+/* --- ALERTAS (MENSAGENS DE SUCESSO) --- */
+.alert-success {
+  background-color: #3d5c4a !important; /* Verde pastel mais escuro */
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-weight: 500;
+}
+
+/* --- FORMULÁRIOS (LOGIN E REGISTO) --- */
+label, .form-label {
+  color: #ffffff !important;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.form-control {
+  background-color: #2a2a3d !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+  background-color: #2a2a3d !important;
+  color: #ffffff !important;
+  border-color: #8c78b0 !important;
+  box-shadow: 0 0 0 0.25rem rgba(140, 120, 176, 0.25) !important;
+  outline: none;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* --- PÁGINA DE DETALHES --- */
+.card {
+  background-color: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.card-header {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+}
+
+.table, .table th, .table td {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+.table tr:nth-child(1) th { color: #ffb3ba !important; }
+.table tr:nth-child(2) th { color: #5f8264 !important; }
+.table tr:nth-child(3) th { color: #bae1ff !important; }
+
+/* --- BOTÕES --- */
+.btn-primary {
+  background-color: #0056b3 !important;
+  border: none !important;
+  padding: 10px 20px;
+}
+
+/* Botão de Detalhes Customizado (Roxo da Imagem) */
+.btn-detalhes {
+  background-color: #8c78b0 !important;
+  border: none !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-detalhes:hover {
+  background-color: #7a669d !important;
+  transform: translateY(-2px);
+  color: #ffffff !important;
+}
+
+/* --- BOTÃO "EDITAR PERFIL" NA PÁGINA DE DETALHES --- */
+.card-footer .btn-warning {
+  background-color: #8c78b0 !important;
+  border-color: #8c78b0 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  padding: 8px 20px;
+  transition: all 0.3s ease;
+}
+
+.footer {
+  background-color: #1a1a26;
+  color: white !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
