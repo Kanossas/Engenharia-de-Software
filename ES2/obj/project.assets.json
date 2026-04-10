@@ -2979,26 +2979,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\vasco\\.nuget\\packages\\": {}
+    "C:\\Users\\Utilizador\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\vasco\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj",
+      "projectUniqueName": "C:\\Users\\Utilizador\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj",
       "projectName": "ES2",
-      "projectPath": "C:\\Users\\vasco\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj",
-      "packagesPath": "C:\\Users\\vasco\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\vasco\\RiderProjects\\Engenharia-de-Software\\ES2\\obj\\",
+      "projectPath": "C:\\Users\\Utilizador\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj",
+      "packagesPath": "C:\\Users\\Utilizador\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Utilizador\\RiderProjects\\Engenharia-de-Software\\ES2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\vasco\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Utilizador\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
