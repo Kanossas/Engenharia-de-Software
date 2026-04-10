@@ -1,0 +1,28 @@
+@model ES2.Models.Atividade
+
+@{
+    ViewData["Title"] = "Remover Atividade";
+}
+
+<h2>Remover Atividade</h2>
+
+<div class="alert alert-warning">
+    <strong>Tens a certeza que queres remover esta atividade?</strong>
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Nome</dt>
+    <dd class="col-sm-9">@Model.Nome</dd>
+
+    <dt class="col-sm-3">Local</dt>
+    <dd class="col-sm-9">@Model.Local</dd>
+
+    <dt class="col-sm-3">Capacidade</dt>
+    <dd class="col-sm-9">@Model.Capacidade</dd>
+</dl>
+
+<form asp-action="Remover" asp-route-id="@Model.IdAtividade" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger">Sim, Remover</button>
+    <a href="javascript:history.back()" class="btn btn-secondary ms-2">Cancelar</a>
+</form>

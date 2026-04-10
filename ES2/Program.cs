@@ -25,6 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Isto diz ao .NET: "quando alguém pedir IUtilizadorRepository, usa UtilizadorRepository"
 builder.Services.AddScoped<IUtilizadorRepository, UtilizadorRepository>();
+builder.Services.AddScoped<IAtividadeRepository, AtividadeRepository>();
 builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 
 

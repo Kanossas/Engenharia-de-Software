@@ -1,0 +1,46 @@
+@model ES2.DTOs.EditarAtividadeDto
+
+@{
+    ViewData["Title"] = "Editar Atividade";
+    var atividadeId = ViewBag.AtividadeId;
+}
+
+<h2>Editar Atividade</h2>
+
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success">@TempData["Sucesso"]</div>
+}
+
+<form asp-action="Editar" asp-route-id="@atividadeId" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Nome" class="form-label">Nome</label>
+        <input asp-for="Nome" class="form-control" />
+        <span asp-validation-for="Nome" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Local" class="form-label">Local</label>
+        <input asp-for="Local" class="form-control" />
+        <span asp-validation-for="Local" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Capacidade" class="form-label">Capacidade</label>
+        <input asp-for="Capacidade" class="form-control" type="number" />
+        <span asp-validation-for="Capacidade" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="IdCategoria" class="form-label">ID Categoria</label>
+        <input asp-for="IdCategoria" class="form-control" type="number" />
+        <span asp-validation-for="IdCategoria" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Alterações</button>
+    <a href="javascript:history.back()" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
