@@ -4,6 +4,8 @@ namespace ES2.DTOs;
 
 public class CriarEventoDto
 {
+    public int? IdEvento { get; set; }
+
     [Required(ErrorMessage = "O nome do evento é obrigatório.")]
     [StringLength(100, ErrorMessage = "O nome do evento não pode ter mais de 100 caracteres.")]
     public string Nome { get; set; } = string.Empty;

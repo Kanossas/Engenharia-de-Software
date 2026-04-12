@@ -4,7 +4,7 @@
 {
     @foreach (var evento in Model)
     {
-        <tr>
+        <tr data-evento-id="@evento.IdEvento" style="cursor: pointer;">
             <td>@evento.Nome</td>
             <td>@(evento.Data?.ToString("dd/MM/yyyy") ?? "-")</td>
             <td>@(evento.HoraInicio?.ToString("HH:mm") ?? "-")</td>

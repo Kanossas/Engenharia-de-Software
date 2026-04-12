@@ -8,9 +8,12 @@
 <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
     <div>
         <h2 class="mb-1">Eventos</h2>
-        <p class="text-light mb-0">Lista dos eventos já criados no sistema.</p>
+        <p class="text-light mb-0">Lista dos eventos ja criados no sistema.</p>
     </div>
-    <a asp-action="Criar" class="btn btn-success">Novo Evento</a>
+    <div class="d-flex gap-2">
+        <a id="btnEditarEvento" class="btn btn-primary disabled" aria-disabled="true">Editar Evento</a>
+        <a asp-action="Criar" class="btn btn-success">Novo Evento</a>
+    </div>
 </div>
 
 @if (TempData["Sucesso"] != null)
@@ -66,26 +69,7 @@
                 </tr>
                 </thead>
                 <tbody id="tabelaEventos">
-                @if (Model.Any())
-                {
-                    @foreach (var evento in Model)
-                    {
-                        <tr>
-                            <td>@evento.Nome</td>
-                            <td>@(evento.Data?.ToString("dd/MM/yyyy") ?? "-")</td>
-                            <td>@(evento.HoraInicio?.ToString("HH:mm") ?? "-")</td>
-                            <td>@(string.IsNullOrWhiteSpace(evento.Local) ? "-" : evento.Local)</td>
-                            <td>@(evento.IdCategoriaNavigation?.Nome ?? "-")</td>
-                            <td>@(evento.CapMax?.ToString() ?? "-")</td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="6" class="text-center py-4">Nenhum evento encontrado.</td>
-                    </tr>
-                }
+                <partial name="_TabelaEventos" model="Model" />
                 </tbody>
             </table>
         </div>
@@ -95,9 +79,64 @@
 @section Scripts {
     <script>
         const tbody = document.getElementById('tabelaEventos');
+        const btnEditarEvento = document.getElementById('btnEditarEvento');
         const inputs = ['filtroNome', 'filtroLocal'];
         const selects = ['filtroData', 'filtroCategoria'];
         let debounce;
+        let eventoSelecionadoId = null;
+
+        function atualizarBotaoEdicao() {
+            if (eventoSelecionadoId) {
+                btnEditarEvento.classList.remove('disabled');
+                btnEditarEvento.removeAttribute('aria-disabled');
+                btnEditarEvento.href = '@Url.Action("Editar", "Evento")/' + eventoSelecionadoId;
+                return;
+            }
+
+            btnEditarEvento.classList.add('disabled');
+            btnEditarEvento.setAttribute('aria-disabled', 'true');
+            btnEditarEvento.removeAttribute('href');
+        }
+
+        function selecionarLinha(row) {
+            tbody.querySelectorAll('tr[data-evento-id]').forEach(tr => tr.classList.remove('evento-selecionado'));
+
+            if (!row) {
+                eventoSelecionadoId = null;
+                atualizarBotaoEdicao();
+                return;
+            }
+
+            row.classList.add('evento-selecionado');
+            eventoSelecionadoId = row.dataset.eventoId;
+            atualizarBotaoEdicao();
+        }
+
+        tbody.addEventListener('click', event => {
+            const row = event.target.closest('tr[data-evento-id]');
+            if (!row) {
+                return;
+            }
+
+            if (eventoSelecionadoId === row.dataset.eventoId) {
+                selecionarLinha(null);
+                return;
+            }
+
+            selecionarLinha(row);
+        });
+
+        document.addEventListener('click', event => {
+            if (!eventoSelecionadoId) {
+                return;
+            }
+
+            if (event.target.closest('#tabelaEventos') || event.target.closest('#btnEditarEvento')) {
+                return;
+            }
+
+            selecionarLinha(null);
+        });
 
         function pesquisar() {
             const params = new URLSearchParams({
@@ -109,7 +148,17 @@
 
             fetch('@Url.Action("Pesquisar", "Evento")?' + params)
                 .then(r => r.text())
-                .then(html => tbody.innerHTML = html);
+                .then(html => {
+                    tbody.innerHTML = html;
+
+                    if (!eventoSelecionadoId) {
+                        atualizarBotaoEdicao();
+                        return;
+                    }
+
+                    const rowSelecionada = tbody.querySelector(`tr[data-evento-id="${eventoSelecionadoId}"]`);
+                    selecionarLinha(rowSelecionada);
+                });
         }
 
         inputs.forEach(id => {
@@ -122,5 +171,21 @@
         selects.forEach(id => {
             document.getElementById(id).addEventListener('change', pesquisar);
         });
+
+        atualizarBotaoEdicao();
     </script>
+
+    <style>
+        #tabelaEventos tr[data-evento-id] {
+            transition: background-color 0.2s ease;
+        }
+
+        #tabelaEventos tr.evento-selecionado td {
+            background-color: rgba(13, 110, 253, 0.32) !important;
+        }
+
+        #tabelaEventos tr.evento-selecionado:hover td {
+            background-color: rgba(13, 110, 253, 0.4) !important;
+        }
+    </style>
 }

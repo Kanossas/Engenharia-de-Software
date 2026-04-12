@@ -24,19 +24,20 @@
 
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Evento" asp-action="Index">Eventos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Evento" asp-action="Criar">Criar Evento</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" id="eventosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Eventos
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="eventosDropdown">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Evento" asp-action="Index">Ver Eventos</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Evento" asp-action="Criar">Criar Evento</a>
+                                </li>
+                            </ul>
                         </li>
                     }
                 </ul>
@@ -86,12 +87,6 @@
         @RenderBody()
     </main>
 </div>
-
-<footer class="footer">
-    <div class="container text-white">
-        &copy; 2026 - ES2 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-    </div>
-</footer>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

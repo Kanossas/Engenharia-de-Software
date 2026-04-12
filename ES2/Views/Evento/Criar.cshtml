@@ -1,8 +1,13 @@
 @model ES2.DTOs.CriarEventoDto
 
 @{
-    ViewData["Title"] = "Criar Evento";
+    var emEdicao = ViewBag.EmEdicao is true;
+    ViewData["Title"] = ViewBag.TituloFormulario ?? "Criar Evento";
     var categorias = ViewBag.Categorias as IEnumerable<ES2.Models.Categoria> ?? Enumerable.Empty<ES2.Models.Categoria>();
+    var acaoFormulario = (string?)ViewBag.FormAction ?? "Criar";
+    int? eventoId = ViewBag.EventoId as int?;
+    var categoriaSelecionada = Model.IdCategoria?.ToString();
+    var mostrarNovaCategoria = !string.IsNullOrWhiteSpace(Model.NovaCategoria);
 }
 
 <div class="container mt-5">
@@ -10,21 +15,26 @@
         <div class="col-lg-8">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white text-center">
-                    <h4>Criar Evento</h4>
+                    <h4>@ViewData["Title"]</h4>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Criar" method="post">
+                    <form asp-action="@acaoFormulario" asp-route-id="@eventoId" method="post">
+                        @if (Model.IdEvento.HasValue)
+                        {
+                            <input asp-for="IdEvento" type="hidden" />
+                        }
+
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="row">
                             <div class="col-md-8 mb-3">
                                 <label asp-for="Nome" class="form-label"></label>
-                                <input asp-for="Nome" class="form-control" placeholder="Ex: Conferência de Tecnologia" />
+                                <input asp-for="Nome" class="form-control" placeholder="Ex: Conferencia de Tecnologia" />
                                 <span asp-validation-for="Nome" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-4 mb-3">
-                                <label asp-for="Capacidade" class="form-label">Capacidade Máxima</label>
+                                <label asp-for="Capacidade" class="form-label">Capacidade Maxima</label>
                                 <input asp-for="Capacidade" class="form-control" type="number" min="1" />
                                 <span asp-validation-for="Capacidade" class="text-danger"></span>
                             </div>
@@ -44,7 +54,7 @@
                             </div>
 
                             <div class="col-md-4 mb-3">
-                                <label asp-for="Preco" class="form-label">Preço</label>
+                                <label asp-for="Preco" class="form-label">Preco</label>
                                 <input asp-for="Preco" class="form-control" type="number" min="0" step="0.01" />
                                 <span asp-validation-for="Preco" class="text-danger"></span>
                             </div>
@@ -61,15 +71,15 @@
                                 <label class="form-label">Categoria</label>
                                 <input type="hidden" asp-for="IdCategoria" id="hiddenIdCategoria" />
                                 <select class="form-select" id="selectCategoria">
-                                    <option value="">Sem categoria</option>
+                                    <option value="" selected="@(string.IsNullOrWhiteSpace(categoriaSelecionada) && !mostrarNovaCategoria)">Sem categoria</option>
                                     @foreach (var cat in categorias)
                                     {
-                                        <option value="@cat.IdCategoria">@cat.Nome</option>
+                                        <option value="@cat.IdCategoria" selected="@(categoriaSelecionada == cat.IdCategoria.ToString())">@cat.Nome</option>
                                     }
-                                    <option value="__nova__">+ Adicionar categoria</option>
+                                    <option value="__nova__" selected="@mostrarNovaCategoria">+ Adicionar categoria</option>
                                 </select>
                                 <input asp-for="NovaCategoria" id="inputNovaCategoria" class="form-control mt-2"
-                                       placeholder="Nome da nova categoria" style="display:none" />
+                                       placeholder="Nome da nova categoria" style="display:@(mostrarNovaCategoria ? "block" : "none")" />
                                 <span asp-validation-for="NovaCategoria" class="text-danger"></span>
                             </div>
                         </div>
@@ -82,7 +92,7 @@
 
                         <div class="d-flex gap-2 justify-content-end">
                             <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-                            <button type="submit" class="btn btn-success">Criar Evento</button>
+                            <button type="submit" class="btn @(emEdicao ? "btn-primary" : "btn-success")">@ViewBag.TextoBotaoSubmeter</button>
                         </div>
                     </form>
                 </div>
@@ -98,17 +108,21 @@
         const input = document.getElementById('inputNovaCategoria');
         const hidden = document.getElementById('hiddenIdCategoria');
 
-        select.addEventListener('change', function () {
-            if (this.value === '__nova__') {
+        function sincronizarCategoria() {
+            if (select.value === '__nova__') {
                 input.style.display = 'block';
                 input.required = true;
                 hidden.value = '';
-            } else {
-                input.style.display = 'none';
-                input.required = false;
-                input.value = '';
-                hidden.value = this.value;
+                return;
             }
-        });
+
+            input.style.display = 'none';
+            input.required = false;
+            input.value = '';
+            hidden.value = select.value;
+        }
+
+        sincronizarCategoria();
+        select.addEventListener('change', sincronizarCategoria);
     </script>
 }

@@ -2,7 +2,6 @@
 body {
   background-color: #212130;
   color: #ffffff;
-  margin-bottom: 60px;
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -154,8 +153,3 @@ label, .form-label {
   transition: all 0.3s ease;
 }
 
-.footer {
-  background-color: #1a1a26;
-  color: white !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}

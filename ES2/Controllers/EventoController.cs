@@ -76,7 +76,7 @@ public class EventoController : Controller
     [HttpGet]
     public async Task<IActionResult> Criar()
     {
-        ViewBag.Categorias = await _context.Categorias.OrderBy(c => c.Nome).ToListAsync();
+        await PrepararFormularioEventoAsync();
         return View(new CriarEventoDto());
     }
 
@@ -86,28 +86,12 @@ public class EventoController : Controller
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Categorias = await _context.Categorias.OrderBy(c => c.Nome).ToListAsync();
+            await PrepararFormularioEventoAsync();
             return View(dto);
         }
 
-        // Se o utilizador quer criar uma nova categoria
         if (!string.IsNullOrWhiteSpace(dto.NovaCategoria))
-        {
-            var categoriaExistente = await _context.Categorias
-                .FirstOrDefaultAsync(c => c.Nome.ToLower() == dto.NovaCategoria.Trim().ToLower());
-
-            if (categoriaExistente != null)
-            {
-                dto.IdCategoria = categoriaExistente.IdCategoria;
-            }
-            else
-            {
-                var novaCategoria = new Categoria { Nome = dto.NovaCategoria.Trim() };
-                _context.Categorias.Add(novaCategoria);
-                await _context.SaveChangesAsync();
-                dto.IdCategoria = novaCategoria.IdCategoria;
-            }
-        }
+            dto.IdCategoria = await ObterOuCriarCategoriaAsync(dto.NovaCategoria);
 
         var evento = new Evento
         {
@@ -153,8 +137,100 @@ public class EventoController : Controller
         catch
         {
             await transaction.RollbackAsync();
-            ModelState.AddModelError(string.Empty, "Não foi possível criar o evento. Tenta novamente.");
+            ModelState.AddModelError(string.Empty, "Nao foi possivel criar o evento. Tenta novamente.");
+            await PrepararFormularioEventoAsync();
             return View(dto);
         }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Editar(int id)
+    {
+        var evento = await _context.Eventos
+            .Include(e => e.BilhetesEventos)
+            .FirstOrDefaultAsync(e => e.IdEvento == id);
+
+        if (evento == null)
+            return NotFound();
+
+        var dto = new CriarEventoDto
+        {
+            IdEvento = evento.IdEvento,
+            Nome = evento.Nome,
+            Data = evento.Data,
+            HoraInicio = evento.HoraInicio,
+            Local = evento.Local ?? string.Empty,
+            Descricao = evento.Descricao ?? string.Empty,
+            Capacidade = evento.CapMax,
+            IdCategoria = evento.IdCategoria,
+            Preco = evento.BilhetesEventos.Any()
+                ? Convert.ToDecimal(evento.BilhetesEventos.OrderBy(b => b.IdBiEv).First().Preco)
+                : 0m
+        };
+
+        await PrepararFormularioEventoAsync(true, id);
+        return View("Criar", dto);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Editar(int id, CriarEventoDto dto)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PrepararFormularioEventoAsync(true, id);
+            return View("Criar", dto);
+        }
+
+        var evento = await _context.Eventos
+            .Include(e => e.BilhetesEventos)
+            .FirstOrDefaultAsync(e => e.IdEvento == id);
+
+        if (evento == null)
+            return NotFound();
+
+        if (!string.IsNullOrWhiteSpace(dto.NovaCategoria))
+            dto.IdCategoria = await ObterOuCriarCategoriaAsync(dto.NovaCategoria);
+
+        evento.Nome = dto.Nome;
+        evento.Data = dto.Data;
+        evento.HoraInicio = dto.HoraInicio;
+        evento.Local = dto.Local;
+        evento.Descricao = dto.Descricao;
+        evento.CapMax = dto.Capacidade;
+        evento.IdCategoria = dto.IdCategoria;
+
+        var bilheteEvento = evento.BilhetesEventos.OrderBy(b => b.IdBiEv).FirstOrDefault();
+        if (bilheteEvento != null)
+            bilheteEvento.Preco = Convert.ToDouble(dto.Preco!.Value);
+
+        await _context.SaveChangesAsync();
+
+        TempData["Sucesso"] = "Evento editado com sucesso.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<int> ObterOuCriarCategoriaAsync(string nomeCategoria)
+    {
+        var categoriaExistente = await _context.Categorias
+            .FirstOrDefaultAsync(c => c.Nome.ToLower() == nomeCategoria.Trim().ToLower());
+
+        if (categoriaExistente != null)
+            return categoriaExistente.IdCategoria;
+
+        var novaCategoria = new Categoria { Nome = nomeCategoria.Trim() };
+        _context.Categorias.Add(novaCategoria);
+        await _context.SaveChangesAsync();
+        return novaCategoria.IdCategoria;
+    }
+
+    private async Task PrepararFormularioEventoAsync(bool emEdicao = false, int? idEvento = null)
+    {
+        ViewBag.Categorias = await _context.Categorias.OrderBy(c => c.Nome).ToListAsync();
+        ViewBag.EmEdicao = emEdicao;
+        ViewBag.FormAction = emEdicao ? nameof(Editar) : nameof(Criar);
+        ViewBag.EventoId = idEvento;
+        ViewBag.TituloFormulario = emEdicao ? "Editar Evento" : "Criar Evento";
+        ViewBag.TextoBotaoSubmeter = emEdicao ? "Guardar Alteracoes" : "Criar Evento";
     }
 }
