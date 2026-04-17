@@ -3,6 +3,7 @@ using ES2.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.AspNetCore.Identity; // Added for PasswordHasher
 
 namespace ES2.Controllers;
 
@@ -46,11 +47,15 @@ public class RegistoController : Controller
                 await _context.SaveChangesAsync(); 
                 idCodPostalFinal = novoCp.IdCodPostal;
             }
+
+            var hasher = new PasswordHasher<Utilizador>(); // Initialize PasswordHasher
+            var hashedPassword = hasher.HashPassword(null, model.Password); // Hash the password
+
             var NovoUtilizador = new Utilizador
             {
                 Nome = model.Nome,
                 Email = model.Email,
-                Password = model.Password,
+                Password = hashedPassword, // Store the hashed password
                 Telemovel = model.Telemovel,
                 TipoUti=2,
                 IdCodPostal = idCodPostalFinal

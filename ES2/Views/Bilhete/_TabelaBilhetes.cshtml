@@ -1,0 +1,23 @@
+@model IEnumerable<ES2.Models.BilhetesEvento>
+
+@if (Model.Any())
+{
+    @foreach (var bilhete in Model)
+    {
+        <tr>
+            <td>@bilhete.IdEventoNavigation.Nome</td>
+            <td>@bilhete.IdBilheteNavigation.Nome</td>
+            <td>@(bilhete.IdBilheteNavigation.IdTipoNavigation?.Nome ?? "-")</td>
+            <td>@(bilhete.IdEventoNavigation.Data?.ToString("dd/MM/yyyy") ?? "-")</td>
+            <td>@(bilhete.IdEventoNavigation.HoraInicio?.ToString("HH:mm") ?? "-")</td>
+            <td>@(string.IsNullOrWhiteSpace(bilhete.IdEventoNavigation.Local) ? "-" : bilhete.IdEventoNavigation.Local)</td>
+            <td>@bilhete.Preco.ToString("0.00") EUR</td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="7" class="text-center py-4">Nenhum bilhete encontrado.</td>
+    </tr>
+}

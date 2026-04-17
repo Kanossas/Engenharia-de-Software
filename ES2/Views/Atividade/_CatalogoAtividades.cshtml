@@ -1,0 +1,40 @@
+@model IEnumerable<ES2.Models.Atividade>
+
+@if (Model.Any())
+{
+    <div class="row g-3">
+        @foreach (var atividade in Model)
+        {
+            <div class="col-12 col-md-6 col-xl-4">
+                <article class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                            <h5 class="card-title mb-0">@atividade.Nome</h5>
+                            <span class="badge text-bg-secondary">@(atividade.IdCategoriaNavigation?.Nome ?? "Sem categoria")</span>
+                        </div>
+                        <dl class="row mb-3 small">
+                            <dt class="col-4">Evento</dt>
+                            <dd class="col-8">@(atividade.IdEventoNavigation?.Nome ?? "-")</dd>
+                            <dt class="col-4">Local</dt>
+                            <dd class="col-8">@(string.IsNullOrWhiteSpace(atividade.Local) ? "-" : atividade.Local)</dd>
+                            <dt class="col-4">Capacidade</dt>
+                            <dd class="col-8">@atividade.Capacidade</dd>
+                        </dl>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Editar" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-primary">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <a asp-action="ConfirmarRemocao" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Remover
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="text-center py-5">Nenhuma atividade encontrada.</div>
+}

@@ -1,0 +1,123 @@
+@model IEnumerable<ES2.Models.BilhetesEvento>
+
+@{
+    ViewData["Title"] = "Bilhetes";
+    var tiposBilhete = ViewBag.TiposBilhete as IEnumerable<ES2.Models.TipoBilhete> ?? Enumerable.Empty<ES2.Models.TipoBilhete>();
+}
+
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <div>
+        <h2 class="mb-1">Bilhetes</h2>
+        <p class="text-light mb-0">Bilhetes disponiveis por evento.</p>
+    </div>
+</div>
+
+<div class="d-flex justify-content-start mb-3">
+    <div class="btn-group btn-group-sm view-toggle" role="group" aria-label="Alternar visualizacao de bilhetes">
+        <button type="button" class="btn btn-outline-light active" data-view-mode="tabela" title="Vista em lista">
+            <i class="bi bi-list-ul"></i>
+        </button>
+        <button type="button" class="btn btn-outline-light" data-view-mode="catalogo" title="Vista em catalogo">
+            <i class="bi bi-grid-3x3-gap"></i>
+        </button>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="get" asp-action="Index" id="formPesquisaBilhetes" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Nome</label>
+                <input type="text" name="nome" id="filtroNome" class="form-control" placeholder="Pesquisar por evento ou bilhete..." value="@ViewBag.FiltroNome" autocomplete="off" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Data</label>
+                <input type="date" name="data" id="filtroData" class="form-control" value="@ViewBag.FiltroData" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Local</label>
+                <input type="text" name="local" id="filtroLocal" class="form-control" placeholder="Pesquisar por local..." value="@ViewBag.FiltroLocal" autocomplete="off" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Tipo</label>
+                <select name="idTipo" id="filtroTipo" class="form-select">
+                    <option value="">Todos</option>
+                    @foreach (var tipo in tiposBilhete)
+                    {
+                        <option value="@tipo.IdTipo" selected="@(ViewBag.FiltroTipo != null && (int)ViewBag.FiltroTipo == tipo.IdTipo)">@tipo.Nome</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">Pesquisar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="resultadoBilhetes">
+    <partial name="_ResultadosBilhetes" model="Model" />
+</div>
+
+@section Scripts {
+    <script>
+        const resultadoBilhetes = document.getElementById('resultadoBilhetes');
+        const botoesVista = document.querySelectorAll('.view-toggle [data-view-mode]');
+        const inputs = ['filtroNome', 'filtroLocal'];
+        const selects = ['filtroData', 'filtroTipo'];
+        const storageKey = 'bilhetes-view-mode';
+        let debounce;
+
+        function aplicarModoVisualizacao() {
+            const modo = sessionStorage.getItem(storageKey) || 'tabela';
+            const tabela = document.getElementById('vistaTabelaBilhetes');
+            const catalogo = document.getElementById('vistaCatalogoBilhetes');
+
+            if (tabela && catalogo) {
+                tabela.classList.toggle('d-none', modo !== 'tabela');
+                catalogo.classList.toggle('d-none', modo !== 'catalogo');
+            }
+
+            botoesVista.forEach(botao => {
+                botao.classList.toggle('active', botao.dataset.viewMode === modo);
+            });
+        }
+
+        function pesquisarBilhetes() {
+            const params = new URLSearchParams({
+                nome: document.getElementById('filtroNome').value,
+                data: document.getElementById('filtroData').value,
+                local: document.getElementById('filtroLocal').value,
+                idTipo: document.getElementById('filtroTipo').value
+            });
+
+            fetch('@Url.Action("Pesquisar", "Bilhete")?' + params)
+                .then(r => r.text())
+                .then(html => {
+                    resultadoBilhetes.innerHTML = html;
+                    aplicarModoVisualizacao();
+                });
+        }
+
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                clearTimeout(debounce);
+                debounce = setTimeout(pesquisarBilhetes, 300);
+            });
+        });
+
+        selects.forEach(id => {
+            document.getElementById(id).addEventListener('change', pesquisarBilhetes);
+        });
+
+        botoesVista.forEach(botao => {
+            botao.addEventListener('click', () => {
+                sessionStorage.setItem(storageKey, botao.dataset.viewMode);
+                aplicarModoVisualizacao();
+            });
+        });
+
+        aplicarModoVisualizacao();
+    </script>
+}

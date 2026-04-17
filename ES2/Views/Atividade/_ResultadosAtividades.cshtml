@@ -1,0 +1,27 @@
+@model IEnumerable<ES2.Models.Atividade>
+
+<div id="vistaTabelaAtividades" class="card shadow">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Evento</th>
+                    <th>Local</th>
+                    <th>Categoria</th>
+                    <th>Capacidade</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="tabelaAtividades">
+                <partial name="_TabelaAtividades" model="Model" />
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="vistaCatalogoAtividades" class="d-none">
+    <partial name="_CatalogoAtividades" model="Model" />
+</div>

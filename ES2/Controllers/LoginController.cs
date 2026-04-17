@@ -2,8 +2,9 @@ using ES2.Data;
 using ES2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication; // Agora vai ficar colorido!
-using System.Security.Claims; // Adicionei este para encurtar as Claims
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace ES2.Controllers;
 
@@ -27,11 +28,12 @@ public class LoginController : Controller
     {
         if (ModelState.IsValid)
         {
-            // Procura o utilizador pelo email e password
+            // Procura o utilizador pelo email
             var user = await _context.Utilizadores
-                .FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
+                .FirstOrDefaultAsync(u => u.Email == model.Email);
 
-            if (user != null)
+            var hasher = new PasswordHasher<Utilizador>();
+            if (user != null && hasher.VerifyHashedPassword(user, user.Password, model.Password) != PasswordVerificationResult.Failed)
             {
                 // 1. Criamos os dados que o site vai "lembrar"
                 var claims = new List<Claim>

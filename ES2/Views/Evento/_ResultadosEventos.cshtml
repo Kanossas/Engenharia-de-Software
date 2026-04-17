@@ -1,0 +1,27 @@
+@model IEnumerable<ES2.Models.Evento>
+
+<div id="vistaTabelaEventos" class="card shadow">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Data</th>
+                    <th>Hora</th>
+                    <th>Local</th>
+                    <th>Categoria</th>
+                    <th>Capacidade</th>
+                </tr>
+                </thead>
+                <tbody id="tabelaEventos">
+                <partial name="_TabelaEventos" model="Model" />
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="vistaCatalogoEventos" class="d-none">
+    <partial name="_CatalogoEventos" model="Model" />
+</div>

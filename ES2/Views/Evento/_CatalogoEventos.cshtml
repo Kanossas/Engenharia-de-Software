@@ -1,0 +1,35 @@
+@model IEnumerable<ES2.Models.Evento>
+
+@if (Model.Any())
+{
+    <div class="row g-3">
+        @foreach (var evento in Model)
+        {
+            <div class="col-12 col-md-6 col-xl-4">
+                <article class="card h-100 shadow-sm catalogo-item" data-evento-id="@evento.IdEvento">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                            <h5 class="card-title mb-0">@evento.Nome</h5>
+                            <span class="badge text-bg-primary">@(evento.IdCategoriaNavigation?.Nome ?? "Sem categoria")</span>
+                        </div>
+                        <p class="card-text text-muted">@(string.IsNullOrWhiteSpace(evento.Descricao) ? "Sem descricao disponivel." : evento.Descricao)</p>
+                        <dl class="row mb-0 small">
+                            <dt class="col-4">Data</dt>
+                            <dd class="col-8">@(evento.Data?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                            <dt class="col-4">Hora</dt>
+                            <dd class="col-8">@(evento.HoraInicio?.ToString("HH:mm") ?? "-")</dd>
+                            <dt class="col-4">Local</dt>
+                            <dd class="col-8">@(string.IsNullOrWhiteSpace(evento.Local) ? "-" : evento.Local)</dd>
+                            <dt class="col-4">Capacidade</dt>
+                            <dd class="col-8">@(evento.CapMax?.ToString() ?? "-")</dd>
+                        </dl>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="text-center py-5">Nenhum evento encontrado.</div>
+}
