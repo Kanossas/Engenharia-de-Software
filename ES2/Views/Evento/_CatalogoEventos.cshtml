@@ -23,6 +23,11 @@
                             <dt class="col-4">Capacidade</dt>
                             <dd class="col-8">@(evento.CapMax?.ToString() ?? "-")</dd>
                         </dl>
+                        <div class="mt-3">
+                            <a asp-action="Participantes" asp-route-id="@evento.IdEvento" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-people"></i> Ver Participantes
+                            </a>
+                        </div>
                     </div>
                 </article>
             </div>

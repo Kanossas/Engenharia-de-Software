@@ -21,6 +21,9 @@
                             <dd class="col-8">@atividade.Capacidade</dd>
                         </dl>
                         <div class="d-flex gap-2">
+                            <a asp-action="Participantes" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-people"></i> Participantes
+                            </a>
                             <a asp-action="Editar" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-primary">
                                 <i class="bi bi-pencil"></i> Editar
                             </a>

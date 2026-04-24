@@ -1,6 +1,8 @@
 using ES2.DTOs;
+using ES2.Data;
 using ES2.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ES2.Controllers;
 
@@ -9,12 +11,18 @@ public class AtividadeController : Controller
     private readonly IAtividadeRepository _atividadeRepository;
     private readonly IEventoRepository _eventoRepository;
     private readonly ICategoriaRepository _categoriaRepository;
+    private readonly AppDbContext _context;
     
-    public AtividadeController(IAtividadeRepository atividadeRepository,IEventoRepository eventoRepository, ICategoriaRepository categoriaRepository)
+    public AtividadeController(
+        IAtividadeRepository atividadeRepository,
+        IEventoRepository eventoRepository,
+        ICategoriaRepository categoriaRepository,
+        AppDbContext context)
     {
         _atividadeRepository = atividadeRepository;
         _eventoRepository = eventoRepository;         
         _categoriaRepository = categoriaRepository;
+        _context = context;
     }
     
     public async Task<IActionResult> Editar(int id)
@@ -137,6 +145,42 @@ public async Task<IActionResult> Pesquisar(string? nome, string? local, int? cap
 
         // Envia a atividade completa para a View mostrar os detalhes
         return View(atividade);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Participantes(int id)
+    {
+        var atividade = await _context.Atividades
+            .Include(a => a.IdEventoNavigation)
+            .Include(a => a.RegistoAtividades.Where(r => !r.IsCancelado))
+            .ThenInclude(r => r.IdUtiNavigation)
+            .FirstOrDefaultAsync(a => a.IdAtividade == id);
+
+        if (atividade == null)
+            return NotFound();
+
+        var dto = new ParticipantesAtividadeDto
+        {
+            IdAtividade = atividade.IdAtividade,
+            NomeAtividade = atividade.Nome,
+            IdEvento = atividade.IdEvento,
+            NomeEvento = atividade.IdEventoNavigation.Nome,
+            LocalAtividade = atividade.Local,
+            Capacidade = atividade.Capacidade,
+            Participantes = atividade.RegistoAtividades
+                .Where(r => !r.IsCancelado)
+                .OrderBy(r => r.IdUtiNavigation.Nome)
+                .Select(r => new ParticipanteInscritoDto
+                {
+                    IdUtilizador = r.IdUtiNavigation.IdUti,
+                    Nome = r.IdUtiNavigation.Nome,
+                    Email = r.IdUtiNavigation.Email,
+                    Telemovel = r.IdUtiNavigation.Telemovel
+                })
+                .ToList()
+        };
+
+        return View(dto);
     }
 
     // POST: /Atividade/Remover/5

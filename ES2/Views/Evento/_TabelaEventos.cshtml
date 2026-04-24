@@ -11,12 +11,17 @@
             <td>@(string.IsNullOrWhiteSpace(evento.Local) ? "-" : evento.Local)</td>
             <td>@(evento.IdCategoriaNavigation?.Nome ?? "-")</td>
             <td>@(evento.CapMax?.ToString() ?? "-")</td>
+            <td class="text-end">
+                <a asp-action="Participantes" asp-route-id="@evento.IdEvento" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-people"></i> Participantes
+                </a>
+            </td>
         </tr>
     }
 }
 else
 {
     <tr>
-        <td colspan="6" class="text-center py-4">Nenhum evento encontrado.</td>
+        <td colspan="7" class="text-center py-4">Nenhum evento encontrado.</td>
     </tr>
 }

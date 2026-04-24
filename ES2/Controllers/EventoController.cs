@@ -210,6 +210,40 @@ public class EventoController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Participantes(int id)
+    {
+        var evento = await _context.Eventos
+            .Include(e => e.RegistoEventos.Where(r => !r.IsCancelado))
+            .ThenInclude(r => r.IdUtiNavigation)
+            .FirstOrDefaultAsync(e => e.IdEvento == id);
+
+        if (evento == null)
+            return NotFound();
+
+        var dto = new ParticipantesEventoDto
+        {
+            IdEvento = evento.IdEvento,
+            NomeEvento = evento.Nome,
+            DataEvento = evento.Data,
+            HoraEvento = evento.HoraInicio,
+            LocalEvento = evento.Local,
+            Participantes = evento.RegistoEventos
+                .Where(r => !r.IsCancelado)
+                .OrderBy(r => r.IdUtiNavigation.Nome)
+                .Select(r => new ParticipanteInscritoDto
+                {
+                    IdUtilizador = r.IdUtiNavigation.IdUti,
+                    Nome = r.IdUtiNavigation.Nome,
+                    Email = r.IdUtiNavigation.Email,
+                    Telemovel = r.IdUtiNavigation.Telemovel
+                })
+                .ToList()
+        };
+
+        return View(dto);
+    }
+
     private async Task<int> ObterOuCriarCategoriaAsync(string nomeCategoria)
     {
         var categoriaExistente = await _context.Categorias

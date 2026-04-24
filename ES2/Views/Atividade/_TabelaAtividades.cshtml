@@ -11,6 +11,9 @@
             <td>@(atividade.IdCategoriaNavigation?.Nome ?? "-")</td>
             <td>@(atividade.Capacidade.ToString() ?? "-")</td>
             <td class="text-end">
+                <a asp-action="Participantes" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-people"></i> Participantes
+                </a>
                 <a asp-action="Editar" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-primary">
                     <i class="bi bi-pencil"></i> Editar
                 </a>

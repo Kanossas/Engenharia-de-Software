@@ -23,6 +23,17 @@
                             <dt class="col-4">Local</dt>
                             <dd class="col-8">@(string.IsNullOrWhiteSpace(bilhete.IdEventoNavigation.Local) ? "-" : bilhete.IdEventoNavigation.Local)</dd>
                         </dl>
+                        <form asp-action="Inscrever" method="post" class="mt-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@bilhete.IdBiEv" />
+                            <input type="hidden" name="nome" value="@ViewBag.FiltroNome" />
+                            <input type="hidden" name="data" value="@ViewBag.FiltroData" />
+                            <input type="hidden" name="local" value="@ViewBag.FiltroLocal" />
+                            <input type="hidden" name="idTipo" value="@ViewBag.FiltroTipo" />
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="bi bi-ticket-perforated"></i> Inscrever
+                            </button>
+                        </form>
                     </div>
                 </article>
             </div>

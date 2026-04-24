@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\hugom\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj": {}
+    "C:\\Users\\Daniel\\Desktop\\Aulas\\2-ANO\\2-Semestre\\ES2\\TrabalhoPratico\\GestaoEventos\\ES2\\ES2.csproj": {}
   },
   "projects": {
-    "C:\\Users\\hugom\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj": {
+    "C:\\Users\\Daniel\\Desktop\\Aulas\\2-ANO\\2-Semestre\\ES2\\TrabalhoPratico\\GestaoEventos\\ES2\\ES2.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\hugom\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj",
+        "projectUniqueName": "C:\\Users\\Daniel\\Desktop\\Aulas\\2-ANO\\2-Semestre\\ES2\\TrabalhoPratico\\GestaoEventos\\ES2\\ES2.csproj",
         "projectName": "ES2",
-        "projectPath": "C:\\Users\\hugom\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj",
-        "packagesPath": "C:\\Users\\hugom\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\hugom\\RiderProjects\\Engenharia-de-Software\\ES2\\obj\\",
+        "projectPath": "C:\\Users\\Daniel\\Desktop\\Aulas\\2-ANO\\2-Semestre\\ES2\\TrabalhoPratico\\GestaoEventos\\ES2\\ES2.csproj",
+        "packagesPath": "C:\\Users\\Daniel\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Daniel\\Desktop\\Aulas\\2-ANO\\2-Semestre\\ES2\\TrabalhoPratico\\GestaoEventos\\ES2\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\hugom\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Daniel\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
