@@ -29,6 +29,11 @@
     <div class="alert alert-success">@TempData["Sucesso"]</div>
 }
 
+@if (TempData["Erro"] != null)
+{
+    <div class="alert alert-danger">@TempData["Erro"]</div>
+}
+
 <div class="card shadow mb-4">
     <div class="card-body">
         <form method="get" asp-action="Index" id="formPesquisa" class="row g-3 align-items-end">

@@ -1,9 +1,14 @@
 @model IEnumerable<ES2.Models.BilhetesEvento>
 
+@{
+    var eventosInscritos = ViewBag.EventosInscritos as HashSet<int> ?? new HashSet<int>();
+}
+
 @if (Model.Any())
 {
     @foreach (var bilhete in Model)
     {
+        var jaInscrito = eventosInscritos.Contains(bilhete.IdEvento);
         <tr>
             <td>@bilhete.IdEventoNavigation.Nome</td>
             <td>@bilhete.IdBilheteNavigation.Nome</td>
@@ -13,17 +18,31 @@
             <td>@(string.IsNullOrWhiteSpace(bilhete.IdEventoNavigation.Local) ? "-" : bilhete.IdEventoNavigation.Local)</td>
             <td>@bilhete.Preco.ToString("0.00") EUR</td>
             <td class="text-end">
-                <form asp-action="Inscrever" method="post" class="d-inline">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" value="@bilhete.IdBiEv" />
-                    <input type="hidden" name="nome" value="@ViewBag.FiltroNome" />
-                    <input type="hidden" name="data" value="@ViewBag.FiltroData" />
-                    <input type="hidden" name="local" value="@ViewBag.FiltroLocal" />
-                    <input type="hidden" name="idTipo" value="@ViewBag.FiltroTipo" />
-                    <button type="submit" class="btn btn-sm btn-success">
-                        <i class="bi bi-ticket-perforated"></i> Inscrever
-                    </button>
-                </form>
+                @if (jaInscrito)
+                {
+                    <form asp-action="CancelarInscricao" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@bilhete.IdBiEv" />
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Tens a certeza que queres cancelar a inscrição neste evento?')">
+                            <i class="bi bi-x-circle"></i> Cancelar Inscrição
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="Inscrever" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@bilhete.IdBiEv" />
+                        <input type="hidden" name="nome" value="@ViewBag.FiltroNome" />
+                        <input type="hidden" name="data" value="@ViewBag.FiltroData" />
+                        <input type="hidden" name="local" value="@ViewBag.FiltroLocal" />
+                        <input type="hidden" name="idTipo" value="@ViewBag.FiltroTipo" />
+                        <button type="submit" class="btn btn-sm btn-success">
+                            <i class="bi bi-ticket-perforated"></i> Inscrever
+                        </button>
+                    </form>
+                }
             </td>
         </tr>
     }

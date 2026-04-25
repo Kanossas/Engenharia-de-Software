@@ -1,9 +1,14 @@
 @model IEnumerable<ES2.Models.Atividade>
 
+@{
+    var atividadesInscritas = ViewBag.AtividadesInscritas as HashSet<int> ?? new HashSet<int>();
+}
+
 @if (Model.Any())
 {
     @foreach (var atividade in Model)
     {
+        var jaInscrito = atividadesInscritas.Contains(atividade.IdAtividade);
         <tr>
             <td>@atividade.Nome</td>
             <td>@(atividade.IdEventoNavigation?.Nome ?? "-")</td>
@@ -14,6 +19,27 @@
                 <a asp-action="Participantes" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-outline-info">
                     <i class="bi bi-people"></i> Participantes
                 </a>
+                @if (jaInscrito)
+                {
+                    <form asp-action="CancelarInscricao" asp-controller="Atividade" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@atividade.IdAtividade" />
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Tens a certeza que queres cancelar a inscrição nesta atividade?')">
+                            <i class="bi bi-x-circle"></i> Cancelar Inscrição
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="Inscrever" asp-controller="Atividade" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@atividade.IdAtividade" />
+                        <button type="submit" class="btn btn-sm btn-success">
+                            <i class="bi bi-person-plus"></i> Inscrever
+                        </button>
+                    </form>
+                }
                 <a asp-action="Editar" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-primary">
                     <i class="bi bi-pencil"></i> Editar
                 </a>

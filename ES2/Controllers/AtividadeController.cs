@@ -1,8 +1,11 @@
 using ES2.DTOs;
 using ES2.Data;
+using ES2.Models;
 using ES2.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ES2.Controllers;
 
@@ -68,12 +71,13 @@ public class AtividadeController : Controller
         
         ViewBag.Categorias = await _categoriaRepository.GetAllAsync();
         ViewBag.Eventos = await _eventoRepository.GetAllAsync();
-        
+
         ViewBag.FiltroNome = nome;
         ViewBag.FiltroLocal = local;
         ViewBag.FiltroCapacidade = capacidade;
         ViewBag.FiltroCategoria = idCategoria;
         ViewBag.FiltroEvento = idEvento;
+        ViewBag.AtividadesInscritas = await ObterAtividadesInscritasAsync();
 
         return View(atividades);
     }
@@ -99,6 +103,7 @@ public async Task<IActionResult> Pesquisar(string? nome, string? local, int? cap
     if (idEvento.HasValue)
         atividades = atividades.Where(a => a.IdEvento == idEvento.Value);
     
+    ViewBag.AtividadesInscritas = await ObterAtividadesInscritasAsync();
     return PartialView("_ResultadosAtividades", atividades);
 }
 
@@ -199,7 +204,125 @@ public async Task<IActionResult> Pesquisar(string? nome, string? local, int? cap
         await _atividadeRepository.DeleteAsync(id);
 
         TempData["Sucesso"] = "Atividade removida com sucesso!";
-        // Redireciona para a lista de atividades do evento
         return RedirectToAction("Index", "Evento", new { id = eventoId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> Inscrever(int id)
+    {
+        var nomeUtilizador = User.FindFirstValue(ClaimTypes.Name);
+        if (string.IsNullOrWhiteSpace(nomeUtilizador))
+            return RedirectToAction("Index", "Login");
+
+        var utilizador = await _context.Utilizadores
+            .FirstOrDefaultAsync(u => u.Nome == nomeUtilizador);
+
+        if (utilizador == null)
+        {
+            TempData["Erro"] = "Nao foi possivel identificar o utilizador autenticado.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var atividade = await _context.Atividades
+            .FirstOrDefaultAsync(a => a.IdAtividade == id);
+
+        if (atividade == null)
+            return NotFound();
+
+        var jaInscrito = await _context.RegistoAtividades
+            .AnyAsync(r => r.IdUti == utilizador.IdUti && r.IdAtividade == id && !r.IsCancelado);
+
+        if (jaInscrito)
+        {
+            TempData["Erro"] = "Ja estas inscrito nesta atividade.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var inscritosAtivos = await _context.RegistoAtividades
+            .CountAsync(r => r.IdAtividade == id && !r.IsCancelado);
+
+        if (inscritosAtivos >= atividade.Capacidade)
+        {
+            TempData["Erro"] = "Esta atividade ja atingiu a capacidade maxima.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var registoExistente = await _context.RegistoAtividades
+            .FirstOrDefaultAsync(r => r.IdUti == utilizador.IdUti && r.IdAtividade == id);
+
+        if (registoExistente == null)
+        {
+            _context.RegistoAtividades.Add(new RegistoAtividade
+            {
+                IdUti = utilizador.IdUti,
+                IdAtividade = id,
+                IsCancelado = false
+            });
+        }
+        else
+        {
+            registoExistente.IsCancelado = false;
+        }
+
+        await _context.SaveChangesAsync();
+
+        TempData["Sucesso"] = $"Inscricao na atividade '{atividade.Nome}' efetuada com sucesso.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> CancelarInscricao(int id)
+    {
+        var nomeUtilizador = User.FindFirstValue(ClaimTypes.Name);
+        if (string.IsNullOrWhiteSpace(nomeUtilizador))
+            return RedirectToAction("Index", "Login");
+
+        var utilizador = await _context.Utilizadores
+            .FirstOrDefaultAsync(u => u.Nome == nomeUtilizador);
+
+        if (utilizador == null)
+        {
+            TempData["Erro"] = "Nao foi possivel identificar o utilizador autenticado.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var registo = await _context.RegistoAtividades
+            .FirstOrDefaultAsync(r => r.IdUti == utilizador.IdUti && r.IdAtividade == id && !r.IsCancelado);
+
+        if (registo == null)
+        {
+            TempData["Erro"] = "Nao tens uma inscricao ativa nesta atividade.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        registo.IsCancelado = true;
+        await _context.SaveChangesAsync();
+
+        TempData["Sucesso"] = "Inscricao na atividade cancelada com sucesso.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<HashSet<int>> ObterAtividadesInscritasAsync()
+    {
+        var nomeUtilizador = User.FindFirstValue(ClaimTypes.Name);
+        if (string.IsNullOrWhiteSpace(nomeUtilizador))
+            return new HashSet<int>();
+
+        var utilizador = await _context.Utilizadores
+            .FirstOrDefaultAsync(u => u.Nome == nomeUtilizador);
+
+        if (utilizador == null)
+            return new HashSet<int>();
+
+        var ids = await _context.RegistoAtividades
+            .Where(r => r.IdUti == utilizador.IdUti && !r.IsCancelado)
+            .Select(r => r.IdAtividade)
+            .ToListAsync();
+
+        return new HashSet<int>(ids);
     }
 }

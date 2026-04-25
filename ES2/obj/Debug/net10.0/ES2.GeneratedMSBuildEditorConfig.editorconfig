@@ -19,137 +19,129 @@ build_property.TargetFrameworkIdentifier = .NETCoreApp
 build_property.TargetFrameworkVersion = v10.0
 build_property.RootNamespace = ES2
 build_property.RootNamespace = ES2
-build_property.ProjectDir = C:\Users\Daniel\Desktop\Aulas\2-ANO\2-Semestre\ES2\TrabalhoPratico\GestaoEventos\ES2\
+build_property.ProjectDir = C:\Users\vasco\Engenharia-de-Software\ES2\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\Daniel\Desktop\Aulas\2-ANO\2-Semestre\ES2\TrabalhoPratico\GestaoEventos\ES2
+build_property.MSBuildProjectDirectory = C:\Users\vasco\Engenharia-de-Software\ES2
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Atividade/ConfirmarRemocao.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Atividade/ConfirmarRemocao.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXRpdmlkYWRlXENvbmZpcm1hclJlbW9jYW8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Atividade/Editar.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Atividade/Editar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXRpdmlkYWRlXEVkaXRhci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Atividade/Index.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Atividade/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXRpdmlkYWRlXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Atividade/Participantes.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXRpdmlkYWRlXFBhcnRpY2lwYW50ZXMuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Atividade/_CatalogoAtividades.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Atividade/_CatalogoAtividades.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXRpdmlkYWRlXF9DYXRhbG9nb0F0aXZpZGFkZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Atividade/_ResultadosAtividades.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Atividade/_ResultadosAtividades.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXRpdmlkYWRlXF9SZXN1bHRhZG9zQXRpdmlkYWRlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Atividade/_TabelaAtividades.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Atividade/_TabelaAtividades.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXRpdmlkYWRlXF9UYWJlbGFBdGl2aWRhZGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Bilhete/Criar.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Bilhete/Criar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmlsaGV0ZVxDcmlhci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Bilhete/Index.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Bilhete/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmlsaGV0ZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Bilhete/_CatalogoBilhetes.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Bilhete/_CatalogoBilhetes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmlsaGV0ZVxfQ2F0YWxvZ29CaWxoZXRlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Bilhete/_ResultadosBilhetes.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Bilhete/_ResultadosBilhetes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmlsaGV0ZVxfUmVzdWx0YWRvc0JpbGhldGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Bilhete/_TabelaBilhetes.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Bilhete/_TabelaBilhetes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmlsaGV0ZVxfVGFiZWxhQmlsaGV0ZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Evento/AdicionarAtividade.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Evento/AdicionarAtividade.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXZlbnRvXEFkaWNpb25hckF0aXZpZGFkZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Evento/Criar.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Evento/Criar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXZlbnRvXENyaWFyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Evento/Detalhes.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Evento/Detalhes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXZlbnRvXERldGFsaGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Evento/Index.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Evento/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXZlbnRvXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Evento/Participantes.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXZlbnRvXFBhcnRpY2lwYW50ZXMuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Evento/_CatalogoEventos.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Evento/_CatalogoEventos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXZlbnRvXF9DYXRhbG9nb0V2ZW50b3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Evento/_ResultadosEventos.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Evento/_ResultadosEventos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXZlbnRvXF9SZXN1bHRhZG9zRXZlbnRvcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Evento/_TabelaEventos.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Evento/_TabelaEventos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRXZlbnRvXF9UYWJlbGFFdmVudG9zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Home/Index.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Home/Privacy.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Login/Index.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Login/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Registo/Registo.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Registo/Registo.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVnaXN0b1xSZWdpc3RvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Shared/Error.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Utilizador/Detalhes.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Utilizador/Detalhes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXRpbGl6YWRvclxEZXRhbGhlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Utilizador/EditarPerfil.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Utilizador/EditarPerfil.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXRpbGl6YWRvclxFZGl0YXJQZXJmaWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/_ViewImports.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/_ViewStart.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Daniel/Desktop/Aulas/2-ANO/2-Semestre/ES2/TrabalhoPratico/GestaoEventos/ES2/Views/Shared/_Layout.cshtml]
+[C:/Users/vasco/Engenharia-de-Software/ES2/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-ny06vri41i
