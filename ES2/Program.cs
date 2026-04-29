@@ -2,6 +2,8 @@ using ES2.Data;
 using ES2.Models;
 using ES2.Repositories;
 using ES2.Repositories.Interfaces;
+using ES2.Services.Inscricoes;
+using ES2.Services.Inscricoes.Regras;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +33,10 @@ builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 builder.Services.AddScoped<IBilhetesEventoRepository, BilhetesEventoRepository>();
 builder.Services.AddScoped<ITipoBilheteRepository, TipoBilheteRepository>();
+builder.Services.AddScoped<IInscricaoEventoService, InscricaoEventoService>();
+builder.Services.AddScoped<IRegraInscricaoEvento, RegraBilheteDuplicado>();
+builder.Services.AddScoped<IRegraInscricaoEvento, RegraInscricaoDuplicadaEvento>();
+builder.Services.AddScoped<IRegraInscricaoEvento, RegraCapacidadeEvento>();
 
 
 var app = builder.Build();

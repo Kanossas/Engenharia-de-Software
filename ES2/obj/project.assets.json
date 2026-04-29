@@ -2979,19 +2979,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Utilizador\\.nuget\\packages\\": {}
+    "C:\\Users\\Daniel\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Utilizador\\Documents\\GitHub\\es2\\Engenharia-de-Software-master\\Engenharia-de-Software\\ES2\\ES2.csproj",
+      "projectUniqueName": "C:\\Users\\Daniel\\Desktop\\Aulas\\2-ANO\\2-Semestre\\ES2\\TrabalhoPratico\\GestaoEventos\\ES2\\ES2.csproj",
       "projectName": "ES2",
-      "projectPath": "C:\\Users\\Utilizador\\Documents\\GitHub\\es2\\Engenharia-de-Software-master\\Engenharia-de-Software\\ES2\\ES2.csproj",
-      "packagesPath": "C:\\Users\\Utilizador\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Utilizador\\Documents\\GitHub\\es2\\Engenharia-de-Software-master\\Engenharia-de-Software\\ES2\\obj\\",
+      "projectPath": "C:\\Users\\Daniel\\Desktop\\Aulas\\2-ANO\\2-Semestre\\ES2\\TrabalhoPratico\\GestaoEventos\\ES2\\ES2.csproj",
+      "packagesPath": "C:\\Users\\Daniel\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Daniel\\Desktop\\Aulas\\2-ANO\\2-Semestre\\ES2\\TrabalhoPratico\\GestaoEventos\\ES2\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Utilizador\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Daniel\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
