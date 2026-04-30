@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ES2.Repositories;
 
-public class AtividadeRepository : IAtividadeRepository
+public class AtividadeRepository : IAtividadeRepository, IAtividadeReadRepository, IAtividadeWriteRepository
 {
     private readonly AppDbContext _context;
 
