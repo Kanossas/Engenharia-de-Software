@@ -35,6 +35,7 @@ builder.Services.AddScoped<IInscricaoEventoService, InscricaoEventoService>();
 builder.Services.AddScoped<IRegraInscricaoEvento, RegraBilheteDuplicado>();
 builder.Services.AddScoped<IRegraInscricaoEvento, RegraInscricaoDuplicadaEvento>();
 builder.Services.AddScoped<IRegraInscricaoEvento, RegraCapacidadeEvento>();
+builder.Services.AddScoped<IRegraInscricaoEvento, RegraDisponibilidadeBilhete>();
 
 // ISP: Registo das interfaces de leitura e escrita de atividades separadamente
 builder.Services.AddScoped<IAtividadeReadRepository, AtividadeRepository>();
@@ -64,6 +65,12 @@ app.MapControllerRoute(
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var inscricaoEventoService = scope.ServiceProvider.GetRequiredService<IInscricaoEventoService>();
+
+    context.Database.ExecuteSqlRaw("""
+        ALTER TABLE "ES2"."Bilhetes_Eventos"
+        ADD COLUMN IF NOT EXISTS "QuantidadeDisponivel" integer NOT NULL DEFAULT 0;
+        """);
 
     bool existeAdmin = context.Utilizadores.Any(u => u.TipoUti == 1);
 
@@ -81,6 +88,12 @@ using (var scope = app.Services.CreateScope())
 
         context.Utilizadores.Add(admin);
         context.SaveChanges();
+    }
+
+    var idsEventos = context.Eventos.Select(e => e.IdEvento).ToList();
+    foreach (var idEvento in idsEventos)
+    {
+        await inscricaoEventoService.GarantirEObterOfertasAsync(idEvento);
     }
 }
 

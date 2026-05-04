@@ -1,7 +1,8 @@
-using ES2.Data;
+using ES2.DTOs;
 using ES2.Models;
 using ES2.Repositories.Interfaces;
 using ES2.Services.Inscricoes;
+using ES2.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,7 @@ public class BilheteController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(string? nome, DateOnly? data, string? local, int? idTipo)
     {
+        await GarantirBilhetesDosEventosAsync();
         var bilhetes = await _bilhetesEventoRepository.GetFilteredWithDetailsAsync(nome, data, local, idTipo);
 
         ViewBag.TiposBilhete = (await _tipoBilheteRepository.GetAllAsync()).OrderBy(t => t.Nome);
@@ -39,7 +41,7 @@ public class BilheteController : Controller
         ViewBag.FiltroData = data?.ToString("yyyy-MM-dd");
         ViewBag.FiltroLocal = local;
         ViewBag.FiltroTipo = idTipo;
-        ViewBag.EventosInscritos = await ObterEventosInscritosAsync();
+        ViewBag.EventosInscritos = await _inscricaoEventoService.ObterEventosInscritosAsync(User.Identity?.Name);
 
         return View(bilhetes);
     }
@@ -47,9 +49,67 @@ public class BilheteController : Controller
     [HttpGet]
     public async Task<IActionResult> Pesquisar(string? nome, DateOnly? data, string? local, int? idTipo)
     {
+        await GarantirBilhetesDosEventosAsync();
         var bilhetes = await _bilhetesEventoRepository.GetFilteredWithDetailsAsync(nome, data, local, idTipo);
-        ViewBag.EventosInscritos = await ObterEventosInscritosAsync();
+        ViewBag.EventosInscritos = await _inscricaoEventoService.ObterEventosInscritosAsync(User.Identity?.Name);
         return PartialView("_ResultadosBilhetes", bilhetes);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Checkout(int id)
+    {
+        var nomeUtilizador = User.FindFirstValue(ClaimTypes.Name);
+        if (string.IsNullOrWhiteSpace(nomeUtilizador))
+            return RedirectToAction("Index", "Login");
+
+        var dto = await _inscricaoEventoService.ObterCheckoutAsync(id, nomeUtilizador);
+        if (dto == null)
+            return NotFound();
+
+        return View(dto);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Checkout(CheckoutBilheteDto dto)
+    {
+        var nomeUtilizador = User.FindFirstValue(ClaimTypes.Name);
+        if (string.IsNullOrWhiteSpace(nomeUtilizador))
+            return RedirectToAction("Index", "Login");
+
+        if (!ModelState.IsValid)
+        {
+            var checkout = await _inscricaoEventoService.ObterCheckoutAsync(dto.IdBilheteEvento, nomeUtilizador);
+            if (checkout == null)
+                return NotFound();
+
+            dto.NomeEvento = checkout.NomeEvento;
+            dto.DataEvento = checkout.DataEvento;
+            dto.HoraEvento = checkout.HoraEvento;
+            dto.LocalEvento = checkout.LocalEvento;
+            dto.NomeBilhete = checkout.NomeBilhete;
+            dto.TipoBilhete = checkout.TipoBilhete;
+            dto.DescricaoAcesso = checkout.DescricaoAcesso;
+            dto.Preco = checkout.Preco;
+            dto.QuantidadeDisponivel = checkout.QuantidadeDisponivel;
+            dto.TiposPagamento = checkout.TiposPagamento;
+
+            return View(dto);
+        }
+
+        var resultado = await _inscricaoEventoService.ComprarAsync(dto, nomeUtilizador);
+        TempData[resultado.Sucesso ? "Sucesso" : "Erro"] = resultado.Mensagem;
+
+        if (!resultado.Sucesso)
+        {
+            var checkout = await _inscricaoEventoService.ObterCheckoutAsync(dto.IdBilheteEvento, nomeUtilizador);
+            if (checkout != null)
+                dto.TiposPagamento = checkout.TiposPagamento;
+
+            return View(dto);
+        }
+
+        return RedirectToAction(nameof(HistoricoCompras));
     }
 
     [HttpPost]
@@ -74,74 +134,30 @@ public class BilheteController : Controller
         if (string.IsNullOrWhiteSpace(nomeUtilizador))
             return RedirectToAction("Index", "Login");
 
-        var utilizador = await _context.Utilizadores
-            .FirstOrDefaultAsync(u => u.Nome == nomeUtilizador);
-
-        if (utilizador == null)
-        {
-            TempData["Erro"] = "Nao foi possivel identificar o utilizador autenticado.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        var bilheteEvento = await _context.BilhetesEventos
-            .FirstOrDefaultAsync(be => be.IdBiEv == id);
-
-        if (bilheteEvento == null)
-            return NotFound();
-
-        var registoEvento = await _context.RegistoEventos
-            .FirstOrDefaultAsync(r => r.IdUti == utilizador.IdUti &&
-                                       r.IdEvento == bilheteEvento.IdEvento &&
-                                       !r.IsCancelado);
-
-        if (registoEvento == null)
-        {
-            TempData["Erro"] = "Nao tens uma inscricao ativa neste evento.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        var bilheteUtil = await _context.BilheteUtils
-            .FirstOrDefaultAsync(bu => bu.IdUtilizador == utilizador.IdUti && bu.IdBiEv == id);
-
-        await using var transaction = await _context.Database.BeginTransactionAsync();
-        try
-        {
-            registoEvento.IsCancelado = true;
-
-            if (bilheteUtil != null)
-                _context.BilheteUtils.Remove(bilheteUtil);
-
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-
-            TempData["Sucesso"] = "Inscricao no evento cancelada com sucesso.";
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            TempData["Erro"] = "Ocorreu um erro ao cancelar a inscricao.";
-        }
+        var resultado = await _inscricaoEventoService.CancelarAsync(id, nomeUtilizador);
+        TempData[resultado.Sucesso ? "Sucesso" : "Erro"] = resultado.Mensagem;
 
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task<HashSet<int>> ObterEventosInscritosAsync()
+    [HttpGet]
+    public async Task<IActionResult> HistoricoCompras()
     {
         var nomeUtilizador = User.FindFirstValue(ClaimTypes.Name);
         if (string.IsNullOrWhiteSpace(nomeUtilizador))
-            return new HashSet<int>();
+            return RedirectToAction("Index", "Login");
 
-        var utilizador = await _context.Utilizadores
-            .FirstOrDefaultAsync(u => u.Nome == nomeUtilizador);
+        var historico = await _inscricaoEventoService.ObterHistoricoAsync(nomeUtilizador);
+        return View(historico);
+    }
 
-        if (utilizador == null)
-            return new HashSet<int>();
-
-        var ids = await _context.RegistoEventos
-            .Where(r => r.IdUti == utilizador.IdUti && !r.IsCancelado)
-            .Select(r => r.IdEvento)
+    private async Task GarantirBilhetesDosEventosAsync()
+    {
+        var idsEventos = await _context.Eventos
+            .Select(e => e.IdEvento)
             .ToListAsync();
 
-        return new HashSet<int>(ids);
+        foreach (var idEvento in idsEventos)
+            await _inscricaoEventoService.GarantirEObterOfertasAsync(idEvento);
     }
 }

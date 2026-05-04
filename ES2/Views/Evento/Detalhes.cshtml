@@ -1,87 +1,202 @@
-@model ES2.Models.Evento
+@model ES2.DTOs.EventoDetalhesCompraDto
 
 @{
     ViewData["Title"] = "Detalhes do Evento";
+    var evento = Model.Evento;
 }
 
-<h2>@Model.Nome</h2>
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
+    <div>
+        <h2 class="mb-1">@evento.Nome</h2>
+        <p class="text-muted mb-0">Informacao completa do evento, atividades e tipos de bilhete disponiveis.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar aos eventos
+    </a>
+</div>
 
 @if (TempData["Sucesso"] != null)
 {
     <div class="alert alert-success">@TempData["Sucesso"]</div>
 }
 
-<dl class="row">
-    <dt class="col-sm-3">Data</dt>
-    <dd class="col-sm-9">@Model.Data?.ToString("dd/MM/yyyy")</dd>
-
-    <dt class="col-sm-3">Hora</dt>
-    <dd class="col-sm-9">@Model.HoraInicio?.ToString("HH:mm")</dd>
-
-    <dt class="col-sm-3">Local</dt>
-    <dd class="col-sm-9">@Model.Local</dd>
-
-    <dt class="col-sm-3">Descrição</dt>
-    <dd class="col-sm-9">@Model.Descricao</dd>
-
-    <dt class="col-sm-3">Capacidade Máxima</dt>
-    <dd class="col-sm-9">@Model.CapMax</dd>
-
-    <dt class="col-sm-3">Categoria</dt>
-    <dd class="col-sm-9">@Model.IdCategoriaNavigation?.Nome</dd>
-</dl>
-
-<hr />
-
-<h3>Atividades</h3>
-
-@* Botão para adicionar nova atividade a este evento *@
-@if (User.IsInRole("Admin"))
+@if (TempData["Erro"] != null)
 {
-    <a asp-controller="Atividade" asp-action="Criar" 
-       asp-route-idEvento="@Model.IdEvento" 
-       class="btn btn-success mb-3">+ Adicionar Atividade</a>
+    <div class="alert alert-danger">@TempData["Erro"]</div>
 }
 
-@if (!Model.Atividades.Any())
-{
-    <p class="text-muted">Este evento ainda não tem atividades.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Local</th>
-                <th>Capacidade</th>
-                <th>Categoria</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var atividade in Model.Atividades)
+<div class="row g-4">
+    <div class="col-12 col-xl-7">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Informacoes do evento</h4>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Data</dt>
+                    <dd class="col-sm-8">@evento.Data?.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4">Hora</dt>
+                    <dd class="col-sm-8">@evento.HoraInicio?.ToString("HH:mm")</dd>
+
+                    <dt class="col-sm-4">Local</dt>
+                    <dd class="col-sm-8">@evento.Local</dd>
+
+                    <dt class="col-sm-4">Descricao</dt>
+                    <dd class="col-sm-8">@evento.Descricao</dd>
+
+                    <dt class="col-sm-4">Capacidade maxima</dt>
+                    <dd class="col-sm-8">@evento.CapMax</dd>
+
+                    <dt class="col-sm-4">Categoria</dt>
+                    <dd class="col-sm-8">@evento.IdCategoriaNavigation?.Nome</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-xl-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                    <div>
+                        <h4 class="card-title mb-1">Comprar bilhete</h4>
+                        <p class="text-muted mb-0">Escolhe o acesso que melhor combina com a tua experiencia.</p>
+                    </div>
+                    <i class="bi bi-cart3 fs-3 text-primary"></i>
+                </div>
+
+                @if (Model.JaInscrito && Model.IdBilheteAtivo.HasValue)
+                {
+                    <div class="alert alert-info d-flex justify-content-between align-items-center gap-3">
+                        <span>Ja tens uma inscricao ativa neste evento.</span>
+                        <form asp-controller="Bilhete" asp-action="CancelarInscricao" method="post" class="mb-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.IdBilheteAtivo.Value" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                        </form>
+                    </div>
+                }
+
+                <div class="row g-3">
+                    @foreach (var oferta in Model.OfertasBilhete)
+                    {
+                        var classesIcone = oferta.TipoBilhete switch
+                        {
+                            "Gold" => "bg-warning-subtle text-warning-emphasis border border-warning-subtle",
+                            "VIP" => "bg-dark text-info border border-info-subtle",
+                            _ => "bg-primary-subtle text-primary border border-primary-subtle"
+                        };
+
+                        <div class="col-12">
+                            <article class="border rounded-4 p-4 text-dark shadow-sm @(oferta.Esgotado ? "bg-light opacity-75" : "bg-white")">
+                                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="rounded-circle d-inline-flex align-items-center justify-content-center @classesIcone" style="width:64px;height:64px;">
+                                            <i class="@oferta.ClasseIcone fs-3"></i>
+                                        </span>
+                                        <div>
+                                            <h5 class="mb-1 fs-4 fw-bold">@oferta.NomeBilhete</h5>
+                                            <small class="text-secondary fs-6">@oferta.TipoBilhete</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge text-bg-dark fs-6 px-3 py-2 rounded-pill">@oferta.Preco.ToString("0.00") EUR</span>
+                                </div>
+
+                                <p class="mb-3 text-dark fs-5 lh-sm">@oferta.DescricaoAcesso</p>
+                                <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                                    <span class="fw-semibold fs-6 @(oferta.Esgotado ? "text-danger" : "text-success")">
+                                        <i class="bi bi-ticket-perforated"></i>
+                                        @if (oferta.Esgotado)
+                                        {
+                                            <text>Esgotado</text>
+                                        }
+                                        else
+                                        {
+                                            <text>@oferta.QuantidadeDisponivel disponiveis</text>
+                                        }
+                                    </span>
+
+                                    @if (Model.JaInscrito)
+                                    {
+                                        <button type="button" class="btn btn-secondary px-3" disabled>Inscricao ativa</button>
+                                    }
+                                    else if (oferta.Esgotado)
+                                    {
+                                        <button type="button" class="btn btn-outline-secondary px-3" disabled>Sem disponibilidade</button>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Bilhete" asp-action="Checkout" asp-route-id="@oferta.IdBilheteEvento" class="btn btn-primary px-4 py-2">
+                                            <i class="bi bi-credit-card"></i> Comprar
+                                        </a>
+                                    }
+                                </div>
+                            </article>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0">Atividades</h3>
+            @if (User.IsInRole("Admin"))
             {
-                <tr>
-                    <td>@atividade.Nome</td>
-                    <td>@atividade.Local</td>
-                    <td>@atividade.Capacidade</td>
-                    <td>@atividade.IdCategoriaNavigation?.Nome</td>
-                    <td>
-                        @* Botão editar - vai para o AtividadeController *@
-                        <a asp-controller="Atividade" asp-action="Editar" 
-                           asp-route-id="@atividade.IdAtividade" 
-                           class="btn btn-sm btn-warning">Editar</a>
-
-                        @* Botão remover - vai para o AtividadeController *@
-                        <a asp-controller="Atividade" asp-action="ConfirmarRemocao" 
-                           asp-route-id="@atividade.IdAtividade" 
-                           class="btn btn-sm btn-danger">Remover</a>
-                    </td>
-                </tr>
+                <a asp-controller="Atividade" asp-action="Criar" asp-route-idEvento="@evento.IdEvento" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Adicionar atividade
+                </a>
             }
-        </tbody>
-    </table>
-}
+        </div>
 
-<a asp-action="Index" class="btn btn-secondary mt-2">← Voltar aos Eventos</a>
+        @if (!evento.Atividades.Any())
+        {
+            <p class="text-muted mb-0">Este evento ainda nao tem atividades.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0">
+                    <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Local</th>
+                        <th>Capacidade</th>
+                        <th>Categoria</th>
+                        <th class="text-end">Acoes</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var atividade in evento.Atividades.OrderBy(a => a.Nome))
+                    {
+                        <tr>
+                            <td>@atividade.Nome</td>
+                            <td>@atividade.Local</td>
+                            <td>@atividade.Capacidade</td>
+                            <td>@atividade.IdCategoriaNavigation?.Nome</td>
+                            <td class="text-end">
+                                <a asp-controller="Atividade" asp-action="Participantes" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-outline-primary">
+                                    Participantes
+                                </a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-controller="Atividade" asp-action="Editar" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-warning">
+                                        Editar
+                                    </a>
+                                    <a asp-controller="Atividade" asp-action="ConfirmarRemocao" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-danger">
+                                        Remover
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

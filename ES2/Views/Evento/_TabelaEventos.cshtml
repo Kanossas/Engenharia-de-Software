@@ -12,6 +12,9 @@
             <td>@(evento.IdCategoriaNavigation?.Nome ?? "-")</td>
             <td>@(evento.CapMax?.ToString() ?? "-")</td>
             <td class="text-end">
+                <a asp-action="Detalhes" asp-route-id="@evento.IdEvento" class="btn btn-sm btn-primary">
+                    <i class="bi bi-ticket-perforated"></i> Ver Evento
+                </a>
                 <a asp-action="Participantes" asp-route-id="@evento.IdEvento" class="btn btn-sm btn-outline-info">
                     <i class="bi bi-people"></i> Participantes
                 </a>

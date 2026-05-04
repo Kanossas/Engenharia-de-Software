@@ -1,21 +1,159 @@
+@model ES2.DTOs.CriarEventoDto
+
 @{
-    Layout = null;
+    ViewData["Title"] = ViewBag.TituloFormulario ?? "Criar Evento";
+    var categorias = ViewBag.Categorias as IEnumerable<ES2.Models.Categoria> ?? Enumerable.Empty<ES2.Models.Categoria>();
+    var emEdicao = ViewBag.EmEdicao != null && (bool)ViewBag.EmEdicao;
 }
 
-<!doctype html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Event Horizon</title>
-    <script>
-        window.__EH_INITIAL_PAGE__ = "create_event";
-    </script>
-    <script type="module" crossorigin src="/event-horizon/assets/event-horizon.js"></script>
-    <link rel="stylesheet" crossorigin href="/event-horizon/assets/event-horizon.css" />
-</head>
-<body>
-<div id="root"></div>
-</body>
-</html>
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <div>
+        <h2 class="mb-1">@ViewBag.TituloFormulario</h2>
+        <p class="text-muted mb-0">O sistema vai gerar automaticamente os bilhetes Standard, Gold e VIP a partir deste evento.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
 
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="@ViewBag.FormAction" asp-route-id="@ViewBag.EventoId" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="col-md-6">
+                <label asp-for="Nome" class="form-label">Nome do evento</label>
+                <input asp-for="Nome" class="form-control" />
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="Data" class="form-label">Data</label>
+                <input asp-for="Data" class="form-control" type="date" />
+                <span asp-validation-for="Data" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="HoraInicio" class="form-label">Hora</label>
+                <input asp-for="HoraInicio" class="form-control" type="time" />
+                <span asp-validation-for="HoraInicio" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Local" class="form-label">Local</label>
+                <input asp-for="Local" class="form-control" />
+                <span asp-validation-for="Local" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="Capacidade" class="form-label">Capacidade maxima</label>
+                <input asp-for="Capacidade" class="form-control" type="number" min="1" />
+                <span asp-validation-for="Capacidade" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="Preco" class="form-label">Preco base</label>
+                <input asp-for="Preco" class="form-control" type="number" step="0.01" min="0" />
+                <span asp-validation-for="Preco" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="QuantidadeStandard" class="form-label">Bilhetes Standard</label>
+                <input asp-for="QuantidadeStandard" class="form-control" type="number" min="0" />
+                <span asp-validation-for="QuantidadeStandard" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="QuantidadeGold" class="form-label">Bilhetes Gold</label>
+                <input asp-for="QuantidadeGold" class="form-control" type="number" min="0" />
+                <span asp-validation-for="QuantidadeGold" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="QuantidadeVip" class="form-label">Bilhetes VIP</label>
+                <input asp-for="QuantidadeVip" class="form-control" type="number" min="0" />
+                <span asp-validation-for="QuantidadeVip" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="IdCategoria" class="form-label">Categoria</label>
+                <select asp-for="IdCategoria" class="form-select">
+                    <option value="">Seleciona uma categoria</option>
+                    @foreach (var categoria in categorias)
+                    {
+                        <option value="@categoria.IdCategoria">@categoria.Nome</option>
+                    }
+                </select>
+                <span asp-validation-for="IdCategoria" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="toggleNovaCategoria">
+                    <i class="bi bi-plus-circle"></i> Criar Nova
+                </button>
+            </div>
+
+            <div class="col-12 d-none" id="blocoNovaCategoria">
+                <label asp-for="NovaCategoria" class="form-label">Nova categoria</label>
+                <input asp-for="NovaCategoria" class="form-control" placeholder="Escreve o nome da nova categoria" />
+                <span asp-validation-for="NovaCategoria" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Descricao" class="form-label">Descricao</label>
+                <textarea asp-for="Descricao" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Descricao" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <div class="alert alert-info mb-0">
+                    <strong>Regras dos bilhetes:</strong> Standard para acesso ao evento, Gold para evento + todas as atividades, e VIP para evento + atividades + zonas restritas. A soma das quantidades nao pode ultrapassar a capacidade maxima.
+                </div>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">@ViewBag.TextoBotaoSubmeter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const toggleNovaCategoria = document.getElementById('toggleNovaCategoria');
+        const blocoNovaCategoria = document.getElementById('blocoNovaCategoria');
+        const inputNovaCategoria = document.getElementById('NovaCategoria');
+        const selectCategoria = document.getElementById('IdCategoria');
+
+        function atualizarBlocoNovaCategoria(mostrar) {
+            blocoNovaCategoria.classList.toggle('d-none', !mostrar);
+            toggleNovaCategoria.innerHTML = mostrar
+                ? '<i class="bi bi-dash-circle"></i> Fechar Nova Categoria'
+                : '<i class="bi bi-plus-circle"></i> Criar Nova';
+
+            if (mostrar) {
+                selectCategoria.value = '';
+                inputNovaCategoria.focus();
+            } else {
+                inputNovaCategoria.value = '';
+            }
+        }
+
+        toggleNovaCategoria.addEventListener('click', () => {
+            atualizarBlocoNovaCategoria(blocoNovaCategoria.classList.contains('d-none'));
+        });
+
+        selectCategoria.addEventListener('change', () => {
+            if (selectCategoria.value) {
+                atualizarBlocoNovaCategoria(false);
+            }
+        });
+
+        if (inputNovaCategoria.value.trim() !== '') {
+            atualizarBlocoNovaCategoria(true);
+        }
+    </script>
+}

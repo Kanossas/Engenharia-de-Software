@@ -13,6 +13,8 @@ public partial class BilhetesEvento
 
     public double Preco { get; set; }
 
+    public int QuantidadeDisponivel { get; set; }
+
     public virtual ICollection<BilheteUtil> BilheteUtils { get; set; } = new List<BilheteUtil>();
 
     public virtual Bilhete IdBilheteNavigation { get; set; } = null!;

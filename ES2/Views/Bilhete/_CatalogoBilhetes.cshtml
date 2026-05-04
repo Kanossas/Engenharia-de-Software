@@ -1,10 +1,15 @@
 @model IEnumerable<ES2.Models.BilhetesEvento>
 
+@{
+    var eventosInscritos = ViewBag.EventosInscritos as HashSet<int> ?? new HashSet<int>();
+}
+
 @if (Model.Any())
 {
     <div class="row g-3">
         @foreach (var bilhete in Model)
         {
+            var jaInscrito = eventosInscritos.Contains(bilhete.IdEvento);
             <div class="col-12 col-md-6 col-xl-4">
                 <article class="card h-100 shadow-sm">
                     <div class="card-body">
@@ -22,18 +27,25 @@
                             <dd class="col-8">@(bilhete.IdEventoNavigation.HoraInicio?.ToString("HH:mm") ?? "-")</dd>
                             <dt class="col-4">Local</dt>
                             <dd class="col-8">@(string.IsNullOrWhiteSpace(bilhete.IdEventoNavigation.Local) ? "-" : bilhete.IdEventoNavigation.Local)</dd>
+                            <dt class="col-4">Stock</dt>
+                            <dd class="col-8">@bilhete.QuantidadeDisponivel</dd>
                         </dl>
-                        <form asp-action="Inscrever" method="post" class="mt-3">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@bilhete.IdBiEv" />
-                            <input type="hidden" name="nome" value="@ViewBag.FiltroNome" />
-                            <input type="hidden" name="data" value="@ViewBag.FiltroData" />
-                            <input type="hidden" name="local" value="@ViewBag.FiltroLocal" />
-                            <input type="hidden" name="idTipo" value="@ViewBag.FiltroTipo" />
-                            <button type="submit" class="btn btn-sm btn-success">
-                                <i class="bi bi-ticket-perforated"></i> Inscrever
-                            </button>
-                        </form>
+                        @if (jaInscrito)
+                        {
+                            <form asp-action="CancelarInscricao" method="post" class="mt-3">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@bilhete.IdBiEv" />
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-x-circle"></i> Cancelar inscricao
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-action="Checkout" asp-route-id="@bilhete.IdBiEv" class="btn btn-sm btn-success mt-3 @(bilhete.QuantidadeDisponivel <= 0 ? "disabled" : "")">
+                                <i class="bi bi-credit-card"></i> Comprar
+                            </a>
+                        }
                     </div>
                 </article>
             </div>

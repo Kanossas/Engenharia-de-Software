@@ -1,0 +1,128 @@
+@model ES2.DTOs.CheckoutBilheteDto
+
+@{
+    ViewData["Title"] = "Checkout do Bilhete";
+}
+
+<div class="d-flex justify-content-between align-items-center gap-3 mt-4 mb-4">
+    <div>
+        <h2 class="mb-1">Checkout</h2>
+        <p class="text-muted mb-0">Confirma o teu bilhete, escolhe o pagamento e valida os teus dados.</p>
+    </div>
+    <a asp-controller="Evento" asp-action="Detalhes" asp-route-id="@Model.IdEvento" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar ao evento
+    </a>
+</div>
+
+@if (TempData["Erro"] != null)
+{
+    <div class="alert alert-danger">@TempData["Erro"]</div>
+}
+
+<div class="row g-4">
+    <div class="col-12 col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Resumo da compra</h4>
+                <div class="border rounded-3 p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                        <div>
+                            <h5 class="mb-0">@Model.NomeBilhete</h5>
+                            <small class="text-muted">@Model.TipoBilhete</small>
+                        </div>
+                        <span class="badge text-bg-primary">@Model.Preco.ToString("0.00") EUR</span>
+                    </div>
+                    <p class="mb-2">@Model.DescricaoAcesso</p>
+                    <dl class="row small mb-0">
+                        <dt class="col-4">Evento</dt>
+                        <dd class="col-8">@Model.NomeEvento</dd>
+                        <dt class="col-4">Data</dt>
+                        <dd class="col-8">@Model.DataEvento?.ToString("dd/MM/yyyy")</dd>
+                        <dt class="col-4">Hora</dt>
+                        <dd class="col-8">@Model.HoraEvento?.ToString("HH:mm")</dd>
+                        <dt class="col-4">Local</dt>
+                        <dd class="col-8">@Model.LocalEvento</dd>
+                    </dl>
+                </div>
+
+                <div class="alert @(Model.QuantidadeDisponivel > 0 ? "alert-success" : "alert-warning") mb-0">
+                    <i class="bi bi-ticket-perforated"></i>
+                    @(Model.QuantidadeDisponivel > 0
+                        ? $"{Model.QuantidadeDisponivel} bilhetes disponiveis neste tipo."
+                        : "Este tipo de bilhete esta atualmente esgotado.")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Dados do comprador</h4>
+                <form asp-action="Checkout" method="post" class="row g-3">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="IdBilheteEvento" type="hidden" />
+                    <input asp-for="IdEvento" type="hidden" />
+                    <input asp-for="NomeEvento" type="hidden" />
+                    <input asp-for="DataEvento" type="hidden" />
+                    <input asp-for="HoraEvento" type="hidden" />
+                    <input asp-for="LocalEvento" type="hidden" />
+                    <input asp-for="NomeBilhete" type="hidden" />
+                    <input asp-for="TipoBilhete" type="hidden" />
+                    <input asp-for="DescricaoAcesso" type="hidden" />
+                    <input asp-for="Preco" type="hidden" />
+                    <input asp-for="QuantidadeDisponivel" type="hidden" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="col-md-6">
+                        <label asp-for="NomeComprador" class="form-label">Nome</label>
+                        <input asp-for="NomeComprador" class="form-control" />
+                        <span asp-validation-for="NomeComprador" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Telemovel" class="form-label">Telemovel</label>
+                        <input asp-for="Telemovel" class="form-control" />
+                        <span asp-validation-for="Telemovel" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="IdTipoPagamento" class="form-label">Metodo de pagamento</label>
+                        <select asp-for="IdTipoPagamento" class="form-select">
+                            <option value="">Seleciona um metodo</option>
+                            @foreach (var tipoPagamento in Model.TiposPagamento)
+                            {
+                                <option value="@tipoPagamento.IdTipoPagamento">@tipoPagamento.Nome</option>
+                            }
+                        </select>
+                        <span asp-validation-for="IdTipoPagamento" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Morada" class="form-label">Morada</label>
+                        <input asp-for="Morada" class="form-control" />
+                        <span asp-validation-for="Morada" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-between align-items-center pt-2">
+                        <strong>Total: @Model.Preco.ToString("0.00") EUR</strong>
+                        <button type="submit" class="btn btn-primary" @(Model.QuantidadeDisponivel <= 0 ? "disabled" : null)>
+                            <i class="bi bi-bag-check"></i> Confirmar compra
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

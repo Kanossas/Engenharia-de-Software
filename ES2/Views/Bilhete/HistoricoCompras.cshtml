@@ -1,0 +1,68 @@
+@model IReadOnlyCollection<ES2.DTOs.HistoricoCompraDto>
+
+@{
+    ViewData["Title"] = "Historico de Compras";
+}
+
+<div class="d-flex justify-content-between align-items-center gap-3 mt-4 mb-4">
+    <div>
+        <h2 class="mb-1">Historico de compras</h2>
+        <p class="text-muted mb-0">Consulta todos os bilhetes que ja compraste e os respetivos metodos de pagamento.</p>
+    </div>
+    <a asp-controller="Evento" asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-calendar-event"></i> Ver eventos
+    </a>
+</div>
+
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success">@TempData["Sucesso"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-cart-x fs-1 text-muted d-block mb-3"></i>
+            <h4>Ainda nao tens compras registadas</h4>
+            <p class="text-muted mb-0">Quando comprares um bilhete, ele vai aparecer aqui automaticamente.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Recibo</th>
+                    <th>Evento</th>
+                    <th>Bilhete</th>
+                    <th>Acesso</th>
+                    <th>Pagamento</th>
+                    <th>Data</th>
+                    <th class="text-end">Valor</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var compra in Model)
+                {
+                    <tr>
+                        <td>#@compra.IdRecibo</td>
+                        <td>@compra.NomeEvento</td>
+                        <td>
+                            <div class="fw-semibold">@compra.NomeBilhete</div>
+                            <small class="text-muted">@compra.TipoBilhete</small>
+                        </td>
+                        <td>@compra.DescricaoAcesso</td>
+                        <td>@compra.MetodoPagamento</td>
+                        <td>@compra.DataCompra.ToString("dd/MM/yyyy")</td>
+                        <td class="text-end fw-semibold">@compra.ValorPago.ToString("0.00") EUR</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

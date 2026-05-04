@@ -16,7 +16,11 @@ public class RegraBilheteDuplicado : IRegraInscricaoEvento
     {
         var jaTemBilhete = await _context.BilheteUtils
             .AnyAsync(bu => bu.IdUtilizador == contexto.Utilizador.IdUti &&
-                            bu.IdBiEv == contexto.BilheteEvento.IdBiEv);
+                            bu.IdBiEv == contexto.BilheteEvento.IdBiEv &&
+                            _context.RegistoEventos.Any(r =>
+                                r.IdUti == contexto.Utilizador.IdUti &&
+                                r.IdEvento == contexto.BilheteEvento.IdEvento &&
+                                !r.IsCancelado));
 
         return jaTemBilhete ? "Ja tens este bilhete associado a tua conta." : null;
     }

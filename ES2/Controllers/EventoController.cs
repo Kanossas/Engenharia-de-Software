@@ -1,6 +1,7 @@
 using ES2.Data;
 using ES2.DTOs;
 using ES2.Models;
+using ES2.Services.Inscricoes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,12 @@ namespace ES2.Controllers;
 public class EventoController : Controller
 {
     private readonly AppDbContext _context;
+    private readonly IInscricaoEventoService _inscricaoEventoService;
 
-    public EventoController(AppDbContext context)
+    public EventoController(AppDbContext context, IInscricaoEventoService inscricaoEventoService)
     {
         _context = context;
+        _inscricaoEventoService = inscricaoEventoService;
     }
 
     [HttpGet]
@@ -128,7 +131,12 @@ public class EventoController : Controller
 
             _context.BilhetesEventos.Add(bilheteEvento);
             await _context.SaveChangesAsync();
-
+            await _inscricaoEventoService.ConfigurarBilhetesEventoAsync(
+                evento.IdEvento,
+                dto.Preco!.Value,
+                dto.QuantidadeStandard!.Value,
+                dto.QuantidadeGold!.Value,
+                dto.QuantidadeVip!.Value);
             await transaction.CommitAsync();
 
             TempData["Sucesso"] = "Evento criado com sucesso.";
@@ -148,6 +156,8 @@ public class EventoController : Controller
     {
         var evento = await _context.Eventos
             .Include(e => e.BilhetesEventos)
+            .ThenInclude(be => be.IdBilheteNavigation)
+            .ThenInclude(b => b.IdTipoNavigation)
             .FirstOrDefaultAsync(e => e.IdEvento == id);
 
         if (evento == null)
@@ -165,7 +175,19 @@ public class EventoController : Controller
             IdCategoria = evento.IdCategoria,
             Preco = evento.BilhetesEventos.Any()
                 ? Convert.ToDecimal(evento.BilhetesEventos.OrderBy(b => b.IdBiEv).First().Preco)
-                : 0m
+                : 0m,
+            QuantidadeStandard = evento.BilhetesEventos
+                .FirstOrDefault(b => b.IdBilheteNavigation.IdTipoNavigation != null &&
+                                     b.IdBilheteNavigation.IdTipoNavigation.Nome == "Standard")
+                ?.QuantidadeDisponivel ?? 0,
+            QuantidadeGold = evento.BilhetesEventos
+                .FirstOrDefault(b => b.IdBilheteNavigation.IdTipoNavigation != null &&
+                                     b.IdBilheteNavigation.IdTipoNavigation.Nome == "Gold")
+                ?.QuantidadeDisponivel ?? 0,
+            QuantidadeVip = evento.BilhetesEventos
+                .FirstOrDefault(b => b.IdBilheteNavigation.IdTipoNavigation != null &&
+                                     b.IdBilheteNavigation.IdTipoNavigation.Nome == "VIP")
+                ?.QuantidadeDisponivel ?? 0
         };
 
         await PrepararFormularioEventoAsync(true, id);
@@ -199,12 +221,13 @@ public class EventoController : Controller
         evento.Descricao = dto.Descricao;
         evento.CapMax = dto.Capacidade;
         evento.IdCategoria = dto.IdCategoria;
-
-        var bilheteEvento = evento.BilhetesEventos.OrderBy(b => b.IdBiEv).FirstOrDefault();
-        if (bilheteEvento != null)
-            bilheteEvento.Preco = Convert.ToDouble(dto.Preco!.Value);
-
         await _context.SaveChangesAsync();
+        await _inscricaoEventoService.ConfigurarBilhetesEventoAsync(
+            evento.IdEvento,
+            dto.Preco!.Value,
+            dto.QuantidadeStandard!.Value,
+            dto.QuantidadeGold!.Value,
+            dto.QuantidadeVip!.Value);
 
         TempData["Sucesso"] = "Evento editado com sucesso.";
         return RedirectToAction(nameof(Index));
@@ -256,18 +279,31 @@ public class EventoController : Controller
         if (evento == null)
             return NotFound();
 
-        return View(evento);
+        var dto = new EventoDetalhesCompraDto
+        {
+            Evento = evento,
+            OfertasBilhete = await _inscricaoEventoService.GarantirEObterOfertasAsync(evento.IdEvento),
+            JaInscrito = (await _inscricaoEventoService.ObterEventosInscritosAsync(User.Identity?.Name)).Contains(evento.IdEvento),
+            IdBilheteAtivo = await _inscricaoEventoService.ObterBilheteAtivoDoEventoAsync(evento.IdEvento, User.Identity?.Name)
+        };
+
+        return View(dto);
     }
 
     private async Task<int> ObterOuCriarCategoriaAsync(string nomeCategoria)
     {
+        var nomeNormalizado = nomeCategoria.Trim();
         var categoriaExistente = await _context.Categorias
-            .FirstOrDefaultAsync(c => c.Nome.ToLower() == nomeCategoria.Trim().ToLower());
+            .FirstOrDefaultAsync(c => c.Nome.ToLower() == nomeNormalizado.ToLower());
 
         if (categoriaExistente != null)
             return categoriaExistente.IdCategoria;
 
-        var novaCategoria = new Categoria { Nome = nomeCategoria.Trim() };
+        var novaCategoria = new Categoria
+        {
+            Nome = nomeNormalizado
+        };
+
         _context.Categorias.Add(novaCategoria);
         await _context.SaveChangesAsync();
         return novaCategoria.IdCategoria;

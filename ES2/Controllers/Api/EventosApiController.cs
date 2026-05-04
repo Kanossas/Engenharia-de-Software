@@ -1,6 +1,7 @@
 using System.Data;
 using ES2.Data;
 using ES2.Models;
+using ES2.Services.Inscricoes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,12 @@ namespace ES2.Controllers.Api;
 public class EventosApiController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IInscricaoEventoService _inscricaoEventoService;
 
-    public EventosApiController(AppDbContext context)
+    public EventosApiController(AppDbContext context, IInscricaoEventoService inscricaoEventoService)
     {
         _context = context;
+        _inscricaoEventoService = inscricaoEventoService;
     }
 
     private async Task<string?> TryGetEventoImageUrlColumnAsync(CancellationToken ct)
@@ -153,6 +156,9 @@ public class EventosApiController : ControllerBase
         public string Descricao { get; set; } = string.Empty;
         public int? Capacidade { get; set; }
         public decimal? Preco { get; set; }
+        public int? QuantidadeStandard { get; set; }
+        public int? QuantidadeGold { get; set; }
+        public int? QuantidadeVip { get; set; }
         public int? IdCategoria { get; set; }
         public string? ImageUrl { get; set; }
     }
@@ -182,6 +188,17 @@ public class EventosApiController : ControllerBase
         if (req.Preco is null or < 0)
             return BadRequest(new { message = "Preco invalido." });
 
+        if (req.QuantidadeStandard is null or < 0 ||
+            req.QuantidadeGold is null or < 0 ||
+            req.QuantidadeVip is null or < 0)
+            return BadRequest(new { message = "As quantidades de bilhetes sao obrigatorias e nao podem ser negativas." });
+
+        if (req.QuantidadeStandard + req.QuantidadeGold + req.QuantidadeVip > req.Capacidade)
+            return BadRequest(new { message = "A soma dos bilhetes Standard, Gold e VIP nao pode ultrapassar a capacidade maxima do evento." });
+
+        if (req.QuantidadeStandard + req.QuantidadeGold + req.QuantidadeVip <= 0)
+            return BadRequest(new { message = "Deves disponibilizar pelo menos um bilhete." });
+
         var evento = new Evento
         {
             Nome = req.Nome.Trim(),
@@ -199,7 +216,7 @@ public class EventosApiController : ControllerBase
             _context.Eventos.Add(evento);
             await _context.SaveChangesAsync(ct);
 
-            // Bilhete base
+            // Bilhete base que depois e expandido para Standard/Gold/VIP.
             var bilheteBase = new Bilhete { Nome = "Entrada Normal" };
             _context.Bilhetes.Add(bilheteBase);
             await _context.SaveChangesAsync(ct);
@@ -245,6 +262,12 @@ public class EventosApiController : ControllerBase
                 }
             }
 
+            await _inscricaoEventoService.ConfigurarBilhetesEventoAsync(
+                evento.IdEvento,
+                req.Preco.Value,
+                req.QuantidadeStandard.Value,
+                req.QuantidadeGold.Value,
+                req.QuantidadeVip.Value);
             await tx.CommitAsync(ct);
             return Ok(new { id = evento.IdEvento });
         }

@@ -17,6 +17,7 @@
             <td>@(bilhete.IdEventoNavigation.HoraInicio?.ToString("HH:mm") ?? "-")</td>
             <td>@(string.IsNullOrWhiteSpace(bilhete.IdEventoNavigation.Local) ? "-" : bilhete.IdEventoNavigation.Local)</td>
             <td>@bilhete.Preco.ToString("0.00") EUR</td>
+            <td>@bilhete.QuantidadeDisponivel</td>
             <td class="text-end">
                 @if (jaInscrito)
                 {
@@ -31,17 +32,9 @@
                 }
                 else
                 {
-                    <form asp-action="Inscrever" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@bilhete.IdBiEv" />
-                        <input type="hidden" name="nome" value="@ViewBag.FiltroNome" />
-                        <input type="hidden" name="data" value="@ViewBag.FiltroData" />
-                        <input type="hidden" name="local" value="@ViewBag.FiltroLocal" />
-                        <input type="hidden" name="idTipo" value="@ViewBag.FiltroTipo" />
-                        <button type="submit" class="btn btn-sm btn-success">
-                            <i class="bi bi-ticket-perforated"></i> Inscrever
-                        </button>
-                    </form>
+                    <a asp-action="Checkout" asp-route-id="@bilhete.IdBiEv" class="btn btn-sm btn-success @(bilhete.QuantidadeDisponivel <= 0 ? "disabled" : "")">
+                        <i class="bi bi-credit-card"></i> Comprar
+                    </a>
                 }
             </td>
         </tr>
@@ -50,6 +43,6 @@
 else
 {
     <tr>
-        <td colspan="8" class="text-center py-4">Nenhum bilhete encontrado.</td>
+        <td colspan="9" class="text-center py-4">Nenhum bilhete encontrado.</td>
     </tr>
 }

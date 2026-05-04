@@ -1,0 +1,68 @@
+@model ES2.DTOs.ParticipantesAtividadeDto
+
+@{
+    ViewData["Title"] = "Participantes da Atividade";
+}
+
+<div class="d-flex justify-content-between align-items-center gap-3 mt-4 mb-4">
+    <div>
+        <h2 class="mb-1">Participantes da atividade</h2>
+        <p class="text-muted mb-0">@Model.NomeAtividade</p>
+    </div>
+    <a asp-controller="Evento" asp-action="Detalhes" asp-route-id="@Model.IdEvento" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar ao evento
+    </a>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-md-2">Evento</dt>
+            <dd class="col-md-10">@Model.NomeEvento</dd>
+
+            <dt class="col-md-2">Local</dt>
+            <dd class="col-md-4">@Model.LocalAtividade</dd>
+
+            <dt class="col-md-2">Capacidade</dt>
+            <dd class="col-md-4">@Model.Capacidade</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">Lista de inscritos</h4>
+            <span class="badge text-bg-primary">@Model.Participantes.Count participante(s)</span>
+        </div>
+
+        @if (!Model.Participantes.Any())
+        {
+            <p class="text-muted mb-0">Ainda nao existem participantes inscritos nesta atividade.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0">
+                    <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telemovel</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var participante in Model.Participantes)
+                    {
+                        <tr>
+                            <td>@participante.Nome</td>
+                            <td>@(string.IsNullOrWhiteSpace(participante.Email) ? "-" : participante.Email)</td>
+                            <td>@(string.IsNullOrWhiteSpace(participante.Telemovel) ? "-" : participante.Telemovel)</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

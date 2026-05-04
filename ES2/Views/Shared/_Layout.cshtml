@@ -63,6 +63,11 @@
                 <ul class="navbar-nav">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
+                        <li class="nav-item me-2">
+                            <a class="nav-link text-white position-relative" asp-controller="Bilhete" asp-action="HistoricoCompras" title="Historico de compras">
+                                <i class="bi bi-cart3"></i>
+                            </a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-circle"></i> Olá, <b>@User.Identity.Name</b>
