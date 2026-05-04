@@ -4,8 +4,6 @@ namespace ES2.DTOs;
 
 public class CriarAtividadeDto
 {
-    // O ID do evento ao qual esta atividade pertence
-    // (guardado num campo escondido no formulário)
     public int IdEvento { get; set; }
 
     [Required(ErrorMessage = "O nome é obrigatório")]

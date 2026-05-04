@@ -11,26 +11,33 @@ namespace ES2.Controllers;
 
 public class AtividadeController : Controller
 {
-    private readonly IAtividadeRepository _atividadeRepository;
+    // ISP: Separação de responsabilidades de leitura e escrita
+    // Utilizadores comuns só precisam de leitura (IAtividadeReadRepository)
+    // Admins precisam de leitura e escrita (IAtividadeWriteRepository)
+    private readonly IAtividadeReadRepository _atividadeReadRepository;
+    private readonly IAtividadeWriteRepository _atividadeWriteRepository;
     private readonly IEventoRepository _eventoRepository;
     private readonly ICategoriaRepository _categoriaRepository;
     private readonly AppDbContext _context;
 
     public AtividadeController(
-        IAtividadeRepository atividadeRepository,
+        IAtividadeReadRepository atividadeReadRepository,
+        IAtividadeWriteRepository atividadeWriteRepository,
         IEventoRepository eventoRepository,
         ICategoriaRepository categoriaRepository,
         AppDbContext context)
     {
-        _atividadeRepository = atividadeRepository;
+        _atividadeReadRepository = atividadeReadRepository;
+        _atividadeWriteRepository = atividadeWriteRepository;
         _eventoRepository = eventoRepository;
         _categoriaRepository = categoriaRepository;
         _context = context;
     }
 
+    // GET: usa apenas IAtividadeReadRepository (leitura)
     public async Task<IActionResult> Editar(int id)
     {
-        var atividade = await _atividadeRepository.GetByIdAsync(id);
+        var atividade = await _atividadeReadRepository.GetByIdAsync(id);
 
         if (atividade == null)
             return NotFound();
@@ -49,11 +56,11 @@ public class AtividadeController : Controller
         return View(dto);
     }
 
+    // GET: usa apenas IAtividadeReadRepository (leitura)
     public async Task<IActionResult> Index(string? nome, string? local, int? capacidade, int? idCategoria,
         int? idEvento)
     {
-        // 1. Carregamos a lista base
-        var atividades = await _atividadeRepository.GetAllAsync();
+        var atividades = await _atividadeReadRepository.GetAllAsync();
 
         if (!string.IsNullOrEmpty(nome))
             atividades = atividades.Where(a => a.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase));
@@ -84,13 +91,12 @@ public class AtividadeController : Controller
         return View(atividades);
     }
 
-
+    // GET: usa apenas IAtividadeReadRepository (leitura)
     public async Task<IActionResult> Pesquisar(string? nome, string? local, int? capacidade, int? idCategoria,
         int? idEvento)
     {
-        var atividades = await _atividadeRepository.GetAllAsync();
+        var atividades = await _atividadeReadRepository.GetAllAsync();
 
-        // Aplicar a mesma lógica de filtro que o Index
         if (!string.IsNullOrEmpty(nome))
             atividades = atividades.Where(a => a.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase));
 
@@ -111,48 +117,41 @@ public class AtividadeController : Controller
         return PartialView("_ResultadosAtividades", atividades);
     }
 
-
-    // POST: /Atividade/Editar/5
-    // Recebe os dados do formulário e guarda na base de dados
+    // POST: usa IAtividadeWriteRepository (escrita) - só admin
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Editar(int id, EditarAtividadeDto dto)
     {
-        // Verifica se os dados são válidos
         if (!ModelState.IsValid)
         {
             ViewBag.AtividadeId = id;
             return View(dto);
         }
 
-        var atividade = await _atividadeRepository.GetByIdAsync(id);
+        var atividade = await _atividadeReadRepository.GetByIdAsync(id);
         if (atividade == null)
             return NotFound();
 
-        // Atualiza os campos com os novos valores do formulário
         atividade.Nome = dto.Nome;
         atividade.Local = dto.Local;
         atividade.Capacidade = dto.Capacidade;
         atividade.IdCategoria = dto.IdCategoria;
 
-        // Guarda na base de dados
-        await _atividadeRepository.UpdateAsync(atividade);
+        // ISP: operação de escrita usa IAtividadeWriteRepository
+        await _atividadeWriteRepository.UpdateAsync(atividade);
 
         TempData["Sucesso"] = "Atividade atualizada com sucesso!";
-        // Redireciona para a página do evento a que pertence esta atividade
         return RedirectToAction("Editar", new { id });
     }
 
-    // GET: /Atividade/ConfirmarRemocao/5
-    // Mostra uma página de confirmação antes de apagar
+    // GET: usa apenas IAtividadeReadRepository (leitura)
     public async Task<IActionResult> ConfirmarRemocao(int id)
     {
-        var atividade = await _atividadeRepository.GetByIdAsync(id);
+        var atividade = await _atividadeReadRepository.GetByIdAsync(id);
 
         if (atividade == null)
             return NotFound();
 
-        // Envia a atividade completa para a View mostrar os detalhes
         return View(atividade);
     }
 
@@ -192,20 +191,19 @@ public class AtividadeController : Controller
         return View(dto);
     }
 
-    // POST: /Atividade/Remover/5
-    // Apaga a atividade depois da confirmação
+    // POST: usa IAtividadeWriteRepository (escrita) - só admin
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Remover(int id)
     {
-        var atividade = await _atividadeRepository.GetByIdAsync(id);
+        var atividade = await _atividadeReadRepository.GetByIdAsync(id);
         if (atividade == null)
             return NotFound();
 
-        // Guarda o ID do evento antes de apagar para redirecionar depois
         var eventoId = atividade.IdEvento;
 
-        await _atividadeRepository.DeleteAsync(id);
+        // ISP: operação de escrita usa IAtividadeWriteRepository
+        await _atividadeWriteRepository.DeleteAsync(id);
 
         TempData["Sucesso"] = "Atividade removida com sucesso!";
         return RedirectToAction("Index", "Evento", new { id = eventoId });
@@ -329,7 +327,8 @@ public class AtividadeController : Controller
 
         return new HashSet<int>(ids);
     }
-    
+
+    // GET: usa apenas IAtividadeReadRepository (leitura)
     [HttpGet]
     public async Task<IActionResult> Criar(int idEvento)
     {
@@ -344,6 +343,7 @@ public class AtividadeController : Controller
         return View("CriarAtividade", dto);
     }
 
+    // POST: usa IAtividadeWriteRepository (escrita) - só admin
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Criar(CriarAtividadeDto dto)
@@ -364,9 +364,10 @@ public class AtividadeController : Controller
             IdCategoria = dto.IdCategoria
         };
 
-        await _atividadeRepository.AddAsync(atividade);
+        // ISP: operação de escrita usa IAtividadeWriteRepository
+        await _atividadeWriteRepository.AddAsync(atividade);
 
         TempData["Sucesso"] = "Atividade criada com sucesso!";
         return RedirectToAction("Detalhes", "Evento", new { id = dto.IdEvento });
     }
-}   
+}

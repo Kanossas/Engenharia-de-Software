@@ -13,8 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", config =>
     {
-        config.Cookie.Name = "UserLoginCookie"; // Nome do ficheiro temporário no browser
-        config.LoginPath = "/Login/Index";      // Se alguém tentar entrar sem login, vai para aqui
+        config.Cookie.Name = "UserLoginCookie";
+        config.LoginPath = "/Login/Index";
         config.AccessDeniedPath = "/Home/Index"; 
     });
 
@@ -25,12 +25,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Isto diz ao .NET: "quando alguém pedir IUtilizadorRepository, usa UtilizadorRepository"
+// Repositórios gerais
 builder.Services.AddScoped<IUtilizadorRepository, UtilizadorRepository>();
-builder.Services.AddScoped<IAtividadeRepository, AtividadeRepository>();
 builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>(); 
-builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 builder.Services.AddScoped<IBilhetesEventoRepository, BilhetesEventoRepository>();
 builder.Services.AddScoped<ITipoBilheteRepository, TipoBilheteRepository>();
 builder.Services.AddScoped<IInscricaoEventoService, InscricaoEventoService>();
@@ -38,6 +36,10 @@ builder.Services.AddScoped<IRegraInscricaoEvento, RegraBilheteDuplicado>();
 builder.Services.AddScoped<IRegraInscricaoEvento, RegraInscricaoDuplicadaEvento>();
 builder.Services.AddScoped<IRegraInscricaoEvento, RegraCapacidadeEvento>();
 
+// ISP: Registo das interfaces de leitura e escrita de atividades separadamente
+builder.Services.AddScoped<IAtividadeReadRepository, AtividadeRepository>();
+builder.Services.AddScoped<IAtividadeWriteRepository, AtividadeRepository>();
+builder.Services.AddScoped<IAtividadeRepository, AtividadeRepository>();
 
 var app = builder.Build();
 
