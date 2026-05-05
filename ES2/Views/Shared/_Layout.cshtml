@@ -39,7 +39,7 @@
                                 <li>
                                     <a class="dropdown-item" asp-controller="Evento" asp-action="Index">Ver Eventos</a>
                                 </li>
-                                @if (User.IsInRole("Admin"))
+                                @if (User.IsInRole("Admin") || User.IsInRole("Organizador"))
                                 {
                                     <li>
                                         <a class="dropdown-item" asp-controller="Evento" asp-action="Criar">Criar Evento</a>

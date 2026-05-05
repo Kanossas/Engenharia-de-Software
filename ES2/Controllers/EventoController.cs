@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ES2.Controllers;
 
-[Authorize]
+[Authorize] // qualquer utilizador autenticado pode ver eventos
 public class EventoController : Controller
 {
     private readonly AppDbContext _context;
@@ -76,6 +76,8 @@ public class EventoController : Controller
         return PartialView("_ResultadosEventos", eventos);
     }
 
+    // Só Admin e Organizador podem criar eventos
+    [Authorize(Roles = "Admin,Organizador")]
     [HttpGet]
     public async Task<IActionResult> Criar()
     {
@@ -83,6 +85,7 @@ public class EventoController : Controller
         return View(new CriarEventoDto());
     }
 
+    [Authorize(Roles = "Admin,Organizador")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Criar(CriarEventoDto dto)
@@ -114,11 +117,7 @@ public class EventoController : Controller
             _context.Eventos.Add(evento);
             await _context.SaveChangesAsync();
 
-            var bilheteBase = new Bilhete
-            {
-                Nome = "Entrada Normal"
-            };
-
+            var bilheteBase = new Bilhete { Nome = "Entrada Normal" };
             _context.Bilhetes.Add(bilheteBase);
             await _context.SaveChangesAsync();
 
@@ -151,6 +150,8 @@ public class EventoController : Controller
         }
     }
 
+    // Só Admin e Organizador podem editar eventos
+    [Authorize(Roles = "Admin,Organizador")]
     [HttpGet]
     public async Task<IActionResult> Editar(int id)
     {
@@ -194,6 +195,7 @@ public class EventoController : Controller
         return View("Criar", dto);
     }
 
+    [Authorize(Roles = "Admin,Organizador")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Editar(int id, CriarEventoDto dto)
@@ -233,6 +235,8 @@ public class EventoController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // Só Admin e Organizador podem ver participantes
+    [Authorize(Roles = "Admin,Organizador")]
     [HttpGet]
     public async Task<IActionResult> Participantes(int id)
     {
@@ -267,6 +271,7 @@ public class EventoController : Controller
         return View(dto);
     }
 
+    // Todos os utilizadores autenticados podem ver detalhes
     [HttpGet]
     public async Task<IActionResult> Detalhes(int id)
     {
@@ -290,6 +295,20 @@ public class EventoController : Controller
         return View(dto);
     }
 
+    // Só Admin e Organizador podem gerir eventos
+    [Authorize(Roles = "Admin,Organizador")]
+    [HttpGet]
+    public async Task<IActionResult> Gerir()
+    {
+        var eventos = await _context.Eventos
+            .Include(e => e.IdCategoriaNavigation)
+            .Include(e => e.Atividades)
+            .OrderBy(e => e.Data)
+            .ToListAsync();
+
+        return View(eventos);
+    }
+
     private async Task<int> ObterOuCriarCategoriaAsync(string nomeCategoria)
     {
         var nomeNormalizado = nomeCategoria.Trim();
@@ -299,11 +318,7 @@ public class EventoController : Controller
         if (categoriaExistente != null)
             return categoriaExistente.IdCategoria;
 
-        var novaCategoria = new Categoria
-        {
-            Nome = nomeNormalizado
-        };
-
+        var novaCategoria = new Categoria { Nome = nomeNormalizado };
         _context.Categorias.Add(novaCategoria);
         await _context.SaveChangesAsync();
         return novaCategoria.IdCategoria;
@@ -318,17 +333,4 @@ public class EventoController : Controller
         ViewBag.TituloFormulario = emEdicao ? "Editar Evento" : "Criar Evento";
         ViewBag.TextoBotaoSubmeter = emEdicao ? "Guardar Alteracoes" : "Criar Evento";
     }
-
-    [HttpGet]
-    public async Task<IActionResult> Gerir()
-    {
-        var eventos = await _context.Eventos
-            .Include(e => e.IdCategoriaNavigation)
-            .Include(e => e.Atividades)
-            .OrderBy(e => e.Data)
-            .ToListAsync();
-
-        return View(eventos);
-    }
 }
-   

@@ -1771,8 +1771,6 @@ C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenhari
 C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\compressed\iw26g3upuk-{0}-9vr69e8ynj-9vr69e8ynj.gz
 C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\compressed\1lhcov8jt2-{0}-87fc7y1x7t-87fc7y1x7t.gz
 C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\compressed\1179810oz2-{0}-mlv21k5csn-mlv21k5csn.gz
-C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\compressed\yv9qbu4bty-{0}-mxhmj23qfu-mxhmj23qfu.gz
-C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\compressed\rouggsg2fw-{0}-mxhmj23qfu-mxhmj23qfu.gz
 C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\staticwebassets.build.json
 C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\staticwebassets.build.json.cache
 C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\staticwebassets.development.json
@@ -1783,3 +1781,5 @@ C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenhari
 C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\ref\ES2.dll
 C:\Users\vasco\Engenharia-de-Software\ES2\obj\Debug\net10.0\compressed\yv9qbu4bty-{0}-qe4z6t94tp-qe4z6t94tp.gz
 C:\Users\vasco\Engenharia-de-Software\ES2\obj\Debug\net10.0\compressed\rouggsg2fw-{0}-qe4z6t94tp-qe4z6t94tp.gz
+C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\compressed\yv9qbu4bty-{0}-qe4z6t94tp-qe4z6t94tp.gz
+C:\Users\Utilizador\Documents\GitHub\es2\Engenharia-de-Software-master\Engenharia-de-Software\ES2\obj\Debug\net10.0\compressed\rouggsg2fw-{0}-qe4z6t94tp-qe4z6t94tp.gz
