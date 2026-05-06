@@ -17,17 +17,20 @@ public class BilheteController : Controller
     private readonly IBilhetesEventoRepository _bilhetesEventoRepository;
     private readonly ITipoBilheteRepository _tipoBilheteRepository;
     private readonly IInscricaoEventoService _inscricaoEventoService;
+    private readonly IConfiguradorBilhetesService _configuradorBilhetes;
 
     public BilheteController(
         AppDbContext context,
         IBilhetesEventoRepository bilhetesEventoRepository,
         ITipoBilheteRepository tipoBilheteRepository,
-        IInscricaoEventoService inscricaoEventoService)
+        IInscricaoEventoService inscricaoEventoService,
+        IConfiguradorBilhetesService configuradorBilhetes)
     {
         _context = context;
         _bilhetesEventoRepository = bilhetesEventoRepository;
         _tipoBilheteRepository = tipoBilheteRepository;
         _inscricaoEventoService = inscricaoEventoService;
+        _configuradorBilhetes = configuradorBilhetes;
     }
 
     [HttpGet]
@@ -158,6 +161,6 @@ public class BilheteController : Controller
             .ToListAsync();
 
         foreach (var idEvento in idsEventos)
-            await _inscricaoEventoService.GarantirEObterOfertasAsync(idEvento);
+            await _configuradorBilhetes.GarantirEObterOfertasAsync(idEvento);
     }
 }

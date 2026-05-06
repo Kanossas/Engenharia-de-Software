@@ -13,12 +13,12 @@ namespace ES2.Controllers.Api;
 public class EventosApiController : ControllerBase
 {
     private readonly AppDbContext _context;
-    private readonly IInscricaoEventoService _inscricaoEventoService;
+    private readonly IConfiguradorBilhetesService _configuradorBilhetes;
 
-    public EventosApiController(AppDbContext context, IInscricaoEventoService inscricaoEventoService)
+    public EventosApiController(AppDbContext context, IConfiguradorBilhetesService configuradorBilhetes)
     {
         _context = context;
-        _inscricaoEventoService = inscricaoEventoService;
+        _configuradorBilhetes = configuradorBilhetes;
     }
 
     private async Task<string?> TryGetEventoImageUrlColumnAsync(CancellationToken ct)
@@ -262,7 +262,7 @@ public class EventosApiController : ControllerBase
                 }
             }
 
-            await _inscricaoEventoService.ConfigurarBilhetesEventoAsync(
+            await _configuradorBilhetes.ConfigurarBilhetesEventoAsync(
                 evento.IdEvento,
                 req.Preco.Value,
                 req.QuantidadeStandard.Value,

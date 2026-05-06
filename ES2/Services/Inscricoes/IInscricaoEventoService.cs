@@ -6,10 +6,6 @@ public interface IInscricaoEventoService
 {
     Task<ResultadoOperacaoInscricao> InscreverAsync(int bilheteEventoId, string nomeUtilizador);
 
-    Task<IReadOnlyCollection<OfertaBilheteEventoDto>> GarantirEObterOfertasAsync(int eventoId);
-
-    Task ConfigurarBilhetesEventoAsync(int eventoId, decimal precoBase, int quantidadeStandard, int quantidadeGold, int quantidadeVip);
-
     Task<CheckoutBilheteDto?> ObterCheckoutAsync(int bilheteEventoId, string nomeUtilizador);
 
     Task<ResultadoOperacaoInscricao> ComprarAsync(CheckoutBilheteDto dto, string nomeUtilizador);

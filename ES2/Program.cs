@@ -2,6 +2,8 @@ using ES2.Data;
 using ES2.Models;
 using ES2.Repositories;
 using ES2.Repositories.Interfaces;
+using ES2.Services;
+using ES2.Services.Interfaces;
 using ES2.Services.Inscricoes;
 using ES2.Services.Inscricoes.Regras;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +33,11 @@ builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>(); 
 builder.Services.AddScoped<IBilhetesEventoRepository, BilhetesEventoRepository>();
 builder.Services.AddScoped<ITipoBilheteRepository, TipoBilheteRepository>();
+builder.Services.AddScoped<IAutenticacaoService, AutenticacaoService>();
+builder.Services.AddScoped<IRegistoService, RegistoService>();
+builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+builder.Services.AddScoped<IRelatorioService, RelatorioService>();
+builder.Services.AddScoped<IConfiguradorBilhetesService, ConfiguradorBilhetesService>();
 builder.Services.AddScoped<IInscricaoEventoService, InscricaoEventoService>();
 builder.Services.AddScoped<IRegraInscricaoEvento, RegraBilheteDuplicado>();
 builder.Services.AddScoped<IRegraInscricaoEvento, RegraInscricaoDuplicadaEvento>();
@@ -65,7 +72,7 @@ app.MapControllerRoute(
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var inscricaoEventoService = scope.ServiceProvider.GetRequiredService<IInscricaoEventoService>();
+    var configuradorBilhetes = scope.ServiceProvider.GetRequiredService<IConfiguradorBilhetesService>();
 
     context.Database.ExecuteSqlRaw("""
         ALTER TABLE "ES2"."Bilhetes_Eventos"
@@ -93,7 +100,7 @@ using (var scope = app.Services.CreateScope())
     var idsEventos = context.Eventos.Select(e => e.IdEvento).ToList();
     foreach (var idEvento in idsEventos)
     {
-        await inscricaoEventoService.GarantirEObterOfertasAsync(idEvento);
+        await configuradorBilhetes.GarantirEObterOfertasAsync(idEvento);
     }
 }
 
