@@ -285,12 +285,13 @@ export default function App() {
                 
                 {/* Dropdown Menu */}
                 <div className="absolute top-full left-0 mt-6 w-48 bg-[#0a0a0a] border border-white/10 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden z-50 shadow-2xl">
-                  <a
-                    href="/Evento/Index"
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage("events")}
                     className="block px-5 py-3 hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer"
                   >
                     Ver Eventos
-                  </a>
+                  </button>
                   <a
                     href="/Evento/Criar"
                     className="block px-5 py-3 hover:bg-white/10 text-white/70 hover:text-white transition-colors border-t border-white/5 cursor-pointer"

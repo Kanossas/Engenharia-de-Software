@@ -169,3 +169,351 @@ label, .form-label {
   transition: all 0.3s ease;
 }
 
+/* --- EVENT HORIZON ACCOUNT SCREENS --- */
+.eh-account-page {
+  --eh-account-bg: url("https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2200&auto=format&fit=crop");
+  width: 100vw;
+  min-height: calc(100vh - 106px);
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: -1rem;
+  padding: clamp(3rem, 7vw, 6rem) 1rem;
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+}
+
+.eh-account-page::before,
+.eh-account-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.eh-account-page::before {
+  background-image: var(--eh-account-bg);
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(1);
+  opacity: 0.24;
+  transform: scale(1.04);
+}
+
+.eh-account-page::after {
+  background:
+    radial-gradient(circle at 78% 22%, rgba(255, 204, 0, 0.13), transparent 24rem),
+    linear-gradient(120deg, rgba(51, 53, 51, 0.97) 0%, rgba(20, 21, 20, 0.9) 52%, rgba(51, 53, 51, 0.98) 100%);
+}
+
+.eh-account-page--login {
+  --eh-account-bg: url("https://images.unsplash.com/photo-1574391884720-bbc3740c59d1?q=80&w=2200&auto=format&fit=crop");
+}
+
+.eh-account-page--profile {
+  --eh-account-bg: url("https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=2200&auto=format&fit=crop");
+}
+
+.eh-account-shell {
+  width: min(100%, 112rem);
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.eh-account-shell--center {
+  display: flex;
+  justify-content: center;
+}
+
+.eh-account-panel {
+  width: min(100%, 32rem);
+  padding: clamp(2rem, 5vw, 3rem);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 30px;
+  background: rgba(8, 8, 8, 0.64);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(18px);
+}
+
+.eh-account-panel--wide {
+  width: min(100%, 56rem);
+}
+
+.eh-account-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.68) !important;
+  font-family: "Courier New", monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.eh-account-back:hover {
+  color: #ffcc00 !important;
+  transform: translateX(-3px);
+}
+
+.eh-account-kicker {
+  color: #ffcc00;
+  font-family: "Courier New", monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.eh-account-title {
+  margin: 0.65rem 0 1rem;
+  color: #ffffff !important;
+  font-size: clamp(2.4rem, 7vw, 5.8rem);
+  font-weight: 900;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.eh-account-title--compact {
+  font-size: clamp(2.3rem, 5vw, 4.4rem);
+}
+
+.eh-account-subtitle {
+  margin: 0 0 2rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-family: "Courier New", monospace;
+}
+
+.eh-account-form {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.eh-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.eh-field label,
+.eh-field .form-label {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78) !important;
+  font-family: "Courier New", monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.eh-input-wrap {
+  position: relative;
+}
+
+.eh-input-wrap i {
+  position: absolute;
+  top: 50%;
+  left: 1.05rem;
+  color: #ffcc00;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.eh-input-wrap .form-control {
+  min-height: 3.35rem;
+  padding-left: 3rem;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07) !important;
+  color: #ffffff !important;
+  font-family: "Courier New", monospace;
+}
+
+.eh-input-wrap .form-control:focus {
+  border-color: rgba(255, 204, 0, 0.75) !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 204, 0, 0.14) !important;
+}
+
+.eh-validation {
+  color: #ffcf8a !important;
+  font-family: "Courier New", monospace;
+  font-size: 0.78rem;
+}
+
+.eh-alert {
+  border: 1px solid rgba(255, 204, 0, 0.24) !important;
+  border-radius: 18px;
+  background: rgba(255, 204, 0, 0.12) !important;
+  color: #fff3bf !important;
+  font-family: "Courier New", monospace;
+}
+
+.eh-alert.validation-summary-valid {
+  display: none;
+}
+
+.eh-alert.validation-summary-errors {
+  padding: 0.9rem 1rem;
+}
+
+.eh-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+  margin-top: 0.4rem;
+}
+
+.eh-btn-primary,
+.eh-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 3.15rem;
+  padding: 0.85rem 1.55rem;
+  border-radius: 999px;
+  font-family: "Courier New", monospace;
+  font-size: 0.86rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.eh-btn-primary {
+  border: 1px solid #ffcc00;
+  background: #ffcc00;
+  color: #000000 !important;
+  box-shadow: 0 16px 34px rgba(255, 204, 0, 0.22);
+}
+
+.eh-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 42px rgba(255, 204, 0, 0.3);
+}
+
+.eh-btn-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff !important;
+}
+
+.eh-btn-secondary:hover {
+  border-color: rgba(255, 204, 0, 0.5);
+  color: #ffcc00 !important;
+  transform: translateY(-2px);
+}
+
+.eh-auth-foot {
+  margin: 1.5rem 0 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-family: "Courier New", monospace;
+  font-size: 0.92rem;
+}
+
+.eh-auth-foot a {
+  color: #ffcc00 !important;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.eh-profile-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(20rem, 0.75fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+
+.eh-profile-card-title {
+  margin: 0 0 1.5rem;
+  color: #ffffff !important;
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.eh-info-list {
+  display: grid;
+  gap: 0;
+}
+
+.eh-info-row {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 1.25rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.eh-info-row:last-child {
+  border-bottom: 0;
+}
+
+.eh-info-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-family: "Courier New", monospace;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eh-info-label i {
+  color: #ffcc00;
+}
+
+.eh-info-value {
+  color: #ffffff;
+  font-family: "Courier New", monospace;
+  font-size: 1rem;
+}
+
+.eh-badge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  border: 1px solid rgba(255, 204, 0, 0.4);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 204, 0, 0.13);
+  color: #ffcc00;
+  font-family: "Courier New", monospace;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .eh-profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .eh-account-page {
+    padding: 2rem 0.75rem;
+  }
+
+  .eh-account-panel {
+    border-radius: 22px;
+    padding: 1.5rem;
+  }
+
+  .eh-info-row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .eh-action-row .eh-btn-primary,
+  .eh-action-row .eh-btn-secondary {
+    width: 100%;
+  }
+}

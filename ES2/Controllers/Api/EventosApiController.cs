@@ -14,11 +14,16 @@ public class EventosApiController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IConfiguradorBilhetesService _configuradorBilhetes;
+    private readonly IInscricaoEventoService _inscricaoEventoService;
 
-    public EventosApiController(AppDbContext context, IConfiguradorBilhetesService configuradorBilhetes)
+    public EventosApiController(
+        AppDbContext context,
+        IConfiguradorBilhetesService configuradorBilhetes,
+        IInscricaoEventoService inscricaoEventoService)
     {
         _context = context;
         _configuradorBilhetes = configuradorBilhetes;
+        _inscricaoEventoService = inscricaoEventoService;
     }
 
     private async Task<string?> TryGetEventoImageUrlColumnAsync(CancellationToken ct)
@@ -125,6 +130,35 @@ public class EventosApiController : ControllerBase
             .FirstOrDefaultAsync(ct);
 
         return evento == null ? NotFound() : Ok(evento);
+    }
+
+    [HttpGet("{id:int}/bilhetes")]
+    public async Task<IActionResult> ListarBilhetes(int id)
+    {
+        var existeEvento = await _context.Eventos.AnyAsync(e => e.IdEvento == id);
+        if (!existeEvento)
+            return NotFound();
+
+        var ofertas = await _configuradorBilhetes.GarantirEObterOfertasAsync(id);
+        var jaInscrito = (await _inscricaoEventoService.ObterEventosInscritosAsync(User.Identity?.Name)).Contains(id);
+        var idBilheteAtivo = await _inscricaoEventoService.ObterBilheteAtivoDoEventoAsync(id, User.Identity?.Name);
+
+        return Ok(new
+        {
+            jaInscrito,
+            idBilheteAtivo,
+            ofertas = ofertas.Select(o => new
+            {
+                idBilheteEvento = o.IdBilheteEvento,
+                nomeBilhete = o.NomeBilhete,
+                tipoBilhete = o.TipoBilhete,
+                descricaoAcesso = o.DescricaoAcesso,
+                classeIcone = o.ClasseIcone,
+                preco = o.Preco,
+                quantidadeDisponivel = o.QuantidadeDisponivel,
+                esgotado = o.Esgotado
+            })
+        });
     }
 
     [HttpGet("{id:int}/atividades")]
@@ -278,4 +312,3 @@ public class EventosApiController : ControllerBase
         }
     }
 }
-

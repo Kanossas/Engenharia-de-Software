@@ -9,7 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Event Horizon</title>
     <script>
-        window.__EH_INITIAL_PAGE__ = "home";
+        const initialPage = new URLSearchParams(window.location.search).get("page");
+        window.__EH_INITIAL_PAGE__ = initialPage === "events" ? "events" : "home";
     </script>
     <script type="module" crossorigin src="/event-horizon/assets/event-horizon.js"></script>
     <link rel="stylesheet" crossorigin href="/event-horizon/assets/event-horizon.css" />
@@ -18,4 +19,3 @@
 <div id="root"></div>
 </body>
 </html>
-

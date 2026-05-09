@@ -3,200 +3,951 @@
 @{
     ViewData["Title"] = "Detalhes do Evento";
     var evento = Model.Evento;
+    var atividadesOrdenadas = evento.Atividades.OrderBy(a => a.Nome).ToList();
+    var categoria = evento.IdCategoriaNavigation?.Nome ?? "Evento";
+    var dataEvento = evento.Data?.ToString("dd MMM yyyy", new System.Globalization.CultureInfo("pt-PT")).ToUpperInvariant() ?? "Data a definir";
+    var horaEvento = evento.HoraInicio?.ToString("HH:mm") ?? "Hora a definir";
+    var capacidade = evento.CapMax?.ToString() ?? "Sem limite definido";
 }
 
-<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
-    <div>
-        <h2 class="mb-1">@evento.Nome</h2>
-        <p class="text-muted mb-0">Informacao completa do evento, atividades e tipos de bilhete disponiveis.</p>
-    </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Voltar aos eventos
-    </a>
-</div>
+<style>
+    .event-details-bleed {
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+        margin-top: -1rem;
+        padding: 5rem clamp(1rem, 4vw, 3rem) 7rem;
+        background:
+            radial-gradient(circle at 16% 8%, rgba(250, 204, 21, .18), transparent 28rem),
+            linear-gradient(135deg, rgba(7, 7, 7, .92), rgba(22, 22, 22, .74) 48%, rgba(51, 53, 51, .95)),
+            url("https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2000&auto=format&fit=crop");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
 
-@if (TempData["Sucesso"] != null)
-{
-    <div class="alert alert-success">@TempData["Sucesso"]</div>
-}
+    .event-details-bleed::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(33, 33, 48, .15), #212130 92%);
+        pointer-events: none;
+    }
 
-@if (TempData["Erro"] != null)
-{
-    <div class="alert alert-danger">@TempData["Erro"]</div>
-}
+    .event-details-shell {
+        max-width: 1600px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
 
-<div class="row g-4">
-    <div class="col-12 col-xl-7">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h4 class="card-title mb-3">Informacoes do evento</h4>
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Data</dt>
-                    <dd class="col-sm-8">@evento.Data?.ToString("dd/MM/yyyy")</dd>
+    .event-glass {
+        background: rgba(10, 10, 10, .68);
+        border: 1px solid rgba(255, 255, 255, .11);
+        border-radius: 30px;
+        box-shadow: 0 34px 90px rgba(0, 0, 0, .45);
+        overflow: hidden;
+        backdrop-filter: blur(18px);
+        position: relative;
+    }
 
-                    <dt class="col-sm-4">Hora</dt>
-                    <dd class="col-sm-8">@evento.HoraInicio?.ToString("HH:mm")</dd>
+    .event-glass::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto;
+        height: 420px;
+        background:
+            linear-gradient(180deg, rgba(0, 0, 0, .08), rgba(0, 0, 0, .92)),
+            url("https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=2000&auto=format&fit=crop");
+        background-size: cover;
+        background-position: center;
+        opacity: .2;
+        filter: grayscale(1);
+        pointer-events: none;
+    }
 
-                    <dt class="col-sm-4">Local</dt>
-                    <dd class="col-sm-8">@evento.Local</dd>
+    .event-content {
+        position: relative;
+        z-index: 1;
+        padding: clamp(1.5rem, 4vw, 4rem);
+    }
 
-                    <dt class="col-sm-4">Descricao</dt>
-                    <dd class="col-sm-8">@evento.Descricao</dd>
+    .event-back {
+        display: inline-flex;
+        align-items: center;
+        gap: .55rem;
+        color: rgba(255, 255, 255, .56) !important;
+        text-decoration: none;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: .78rem;
+        font-weight: 800;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        margin-bottom: 3rem;
+        transition: color .2s ease, transform .2s ease;
+    }
 
-                    <dt class="col-sm-4">Capacidade maxima</dt>
-                    <dd class="col-sm-8">@evento.CapMax</dd>
+    .event-back:hover {
+        color: #facc15 !important;
+        transform: translateX(-3px);
+    }
 
-                    <dt class="col-sm-4">Categoria</dt>
-                    <dd class="col-sm-8">@evento.IdCategoriaNavigation?.Nome</dd>
-                </dl>
-            </div>
-        </div>
-    </div>
+    .event-tag {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        background: #facc15;
+        color: #050505;
+        padding: .35rem .85rem;
+        font-size: .64rem;
+        font-weight: 900;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+    }
 
-    <div class="col-12 col-xl-5">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    .event-title {
+        margin: 1.15rem 0 3rem;
+        font-size: clamp(3rem, 8vw, 6.5rem);
+        line-height: .88;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        font-weight: 800;
+        max-width: 12ch;
+    }
+
+    .event-section-title {
+        font-size: clamp(1.45rem, 3vw, 2.15rem);
+        line-height: 1;
+        text-transform: uppercase;
+        font-weight: 900;
+        letter-spacing: 0;
+        margin: 0;
+    }
+
+    .event-meta-list {
+        display: grid;
+        gap: 0;
+        margin-top: 1.5rem;
+    }
+
+    .event-meta-row {
+        display: grid;
+        grid-template-columns: minmax(7.5rem, .55fr) 1fr;
+        gap: 1.25rem;
+        padding: 1.05rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, .07);
+    }
+
+    .event-meta-label {
+        color: rgba(255, 255, 255, .68);
+        font-size: .74rem;
+        font-weight: 900;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+    }
+
+    .event-meta-value {
+        color: #fff;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: .9rem;
+        overflow-wrap: anywhere;
+    }
+
+    .event-top-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(22rem, .9fr);
+        gap: clamp(2rem, 5vw, 5rem);
+        padding-bottom: 4rem;
+        border-bottom: 1px solid rgba(255, 255, 255, .07);
+    }
+
+    .ticket-stack {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1.6rem;
+    }
+
+    .ticket-card {
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, .1);
+        background: rgba(255, 255, 255, .035);
+        padding: 1.35rem;
+        transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .ticket-card:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, .055);
+    }
+
+    .ticket-card.ticket-gold {
+        border-color: rgba(250, 204, 21, .36);
+        background: linear-gradient(90deg, rgba(250, 204, 21, .13), rgba(255, 255, 255, .025));
+        box-shadow: 0 0 30px rgba(250, 204, 21, .06);
+    }
+
+    .ticket-card.ticket-vip {
+        border-color: rgba(99, 102, 241, .42);
+        background: linear-gradient(90deg, rgba(99, 102, 241, .15), rgba(255, 255, 255, .025));
+    }
+
+    .ticket-card.ticket-disabled {
+        opacity: .66;
+    }
+
+    .ticket-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .ticket-name-wrap {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 0;
+    }
+
+    .ticket-icon {
+        width: 3.1rem;
+        height: 3.1rem;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        background: #111;
+        border: 1px solid rgba(255, 255, 255, .11);
+        color: rgba(255, 255, 255, .55);
+        font-size: 1.25rem;
+    }
+
+    .ticket-gold .ticket-icon {
+        color: #facc15;
+        background: rgba(250, 204, 21, .16);
+        border-color: rgba(250, 204, 21, .48);
+    }
+
+    .ticket-vip .ticket-icon {
+        color: #818cf8;
+        background: rgba(99, 102, 241, .16);
+        border-color: rgba(99, 102, 241, .5);
+    }
+
+    .ticket-name {
+        margin: 0;
+        text-transform: uppercase;
+        font-weight: 900;
+        font-size: clamp(1.05rem, 2vw, 1.35rem);
+        line-height: 1;
+    }
+
+    .ticket-type {
+        display: block;
+        margin-top: .35rem;
+        color: rgba(255, 255, 255, .52);
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: .68rem;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+    }
+
+    .ticket-price {
+        white-space: nowrap;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, .1);
+        background: rgba(0, 0, 0, .45);
+        padding: .58rem .9rem;
+        font-weight: 900;
+        font-size: .82rem;
+    }
+
+    .ticket-gold .ticket-price {
+        color: #facc15;
+        border-color: rgba(250, 204, 21, .32);
+    }
+
+    .ticket-vip .ticket-price {
+        color: #a5b4fc;
+        border-color: rgba(99, 102, 241, .32);
+    }
+
+    .ticket-description {
+        color: rgba(255, 255, 255, .66);
+        font-size: .88rem;
+        margin: 1rem 0 0;
+    }
+
+    .ticket-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 1.2rem;
+        flex-wrap: wrap;
+    }
+
+    .stock-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, .07);
+        background: rgba(255, 255, 255, .05);
+        color: rgba(255, 255, 255, .42);
+        padding: .35rem .75rem;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: .68rem;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .stock-pill::before {
+        content: "";
+        width: .42rem;
+        height: .42rem;
+        border-radius: 999px;
+        background: #facc15;
+        opacity: .72;
+    }
+
+    .ticket-button {
+        border-radius: 999px;
+        padding: .72rem 1.25rem;
+        border: 1px solid rgba(255, 255, 255, .15);
+        background: rgba(255, 255, 255, .08);
+        color: rgba(255, 255, 255, .62) !important;
+        font-size: .72rem;
+        font-weight: 900;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: transform .2s ease, background .2s ease, color .2s ease;
+    }
+
+    .ticket-button:not(:disabled):hover {
+        transform: scale(1.04);
+        color: #000 !important;
+        background: #fff;
+    }
+
+    .ticket-button.ticket-buy {
+        background: #facc15;
+        border-color: #facc15;
+        color: #050505 !important;
+        box-shadow: 0 0 15px rgba(250, 204, 21, .2);
+    }
+
+    .ticket-vip .ticket-button.ticket-buy {
+        background: #6366f1;
+        border-color: #6366f1;
+        color: #fff !important;
+        box-shadow: 0 0 15px rgba(99, 102, 241, .2);
+    }
+
+    .event-active-alert {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        border-radius: 18px;
+        border: 1px solid rgba(250, 204, 21, .3);
+        background: rgba(250, 204, 21, .09);
+        color: rgba(255, 255, 255, .84);
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .activities-section {
+        margin-top: 4rem;
+    }
+
+    .activities-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.25rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .activities-count {
+        color: rgba(250, 204, 21, .78);
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: .75rem;
+        font-weight: 800;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+    }
+
+    .activity-tools {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .activity-control,
+    .activity-search,
+    .activity-clear,
+    .admin-activity-link {
+        height: 2.55rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, .18);
+        background: transparent;
+        color: #fff !important;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: .73rem;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .activity-control {
+        padding: 0 2.3rem 0 1rem;
+        min-width: 12rem;
+        appearance: none;
+        background-image: linear-gradient(45deg, transparent 50%, rgba(255,255,255,.55) 50%), linear-gradient(135deg, rgba(255,255,255,.55) 50%, transparent 50%);
+        background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+    }
+
+    .activity-control option {
+        background: #1a1a1a;
+    }
+
+    .activity-filter-panel {
+        display: none;
+        gap: .75rem;
+        margin: 1.25rem 0 1rem;
+        overflow-x: auto;
+        padding-bottom: .25rem;
+    }
+
+    .activity-filter-panel.is-open {
+        display: flex;
+    }
+
+    .activity-search {
+        min-width: 14rem;
+        flex: 1 1 14rem;
+        padding: 0 1.1rem;
+    }
+
+    .activity-search::placeholder {
+        color: rgba(255, 255, 255, .44);
+    }
+
+    .activity-clear,
+    .admin-activity-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        padding: 0 .95rem;
+        text-decoration: none;
+        transition: background .2s ease, color .2s ease, border-color .2s ease;
+    }
+
+    .activity-clear:hover,
+    .admin-activity-link:hover,
+    .activity-clear.is-active {
+        background: #facc15;
+        color: #050505 !important;
+        border-color: #facc15;
+    }
+
+    .activity-list {
+        border-top: 1px solid rgba(255, 255, 255, .05);
+        margin-top: 1rem;
+    }
+
+    .activity-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding: 1.7rem 1.1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, .055);
+        border-radius: 14px;
+        transition: background .2s ease;
+    }
+
+    .activity-row:hover {
+        background: rgba(255, 255, 255, .025);
+    }
+
+    .activity-main {
+        display: flex;
+        align-items: center;
+        gap: clamp(1rem, 3vw, 2.3rem);
+        min-width: 0;
+    }
+
+    .activity-index {
+        color: #facc15;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 1.2rem;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    .activity-title {
+        margin: 0 0 .55rem;
+        color: #fff !important;
+        font-size: clamp(1.45rem, 3vw, 2.35rem);
+        line-height: 1;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .activity-details {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .75rem 1rem;
+        color: rgba(255, 255, 255, .42);
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: .73rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+    }
+
+    .activity-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .6rem;
+        flex-wrap: wrap;
+    }
+
+    .activity-action {
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, .12);
+        color: #fff !important;
+        text-decoration: none;
+        padding: .72rem 1rem;
+        font-size: .72rem;
+        font-weight: 900;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+        transition: background .2s ease, color .2s ease, border-color .2s ease;
+    }
+
+    .activity-action:hover {
+        background: #fff;
+        color: #050505 !important;
+        border-color: #fff;
+    }
+
+    .activity-action.edit {
+        border-color: rgba(250, 204, 21, .45);
+        color: #facc15 !important;
+    }
+
+    .activity-action.remove {
+        border-color: rgba(248, 113, 113, .45);
+        color: #fca5a5 !important;
+    }
+
+    .empty-activities {
+        padding: 5rem 1rem;
+        text-align: center;
+        color: rgba(255, 255, 255, .42);
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: .82rem;
+        font-weight: 800;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+    }
+
+    @@media (max-width: 991.98px) {
+        .event-top-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .activities-toolbar,
+        .activity-row {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .activity-tools,
+        .activity-actions {
+            justify-content: flex-start;
+        }
+    }
+
+    @@media (max-width: 575.98px) {
+        .event-details-bleed {
+            padding-inline: .75rem;
+        }
+
+        .event-content {
+            padding: 1.25rem;
+        }
+
+        .event-meta-row {
+            grid-template-columns: 1fr;
+            gap: .45rem;
+        }
+
+        .ticket-head,
+        .ticket-actions {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .ticket-price,
+        .ticket-button {
+            width: 100%;
+            text-align: center;
+        }
+
+        .activity-main {
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="event-details-bleed">
+    <div class="event-details-shell">
+        @if (TempData["Sucesso"] != null)
+        {
+            <div class="alert alert-success mb-4">@TempData["Sucesso"]</div>
+        }
+
+        @if (TempData["Erro"] != null)
+        {
+            <div class="alert alert-danger mb-4">@TempData["Erro"]</div>
+        }
+
+        <section class="event-glass">
+            <div class="event-content">
+                <a asp-action="Index" class="event-back">
+                    <i class="bi bi-arrow-left"></i>
+                    Voltar para eventos
+                </a>
+
+                <div class="event-top-grid">
                     <div>
-                        <h4 class="card-title mb-1">Comprar bilhete</h4>
-                        <p class="text-muted mb-0">Escolhe o acesso que melhor combina com a tua experiencia.</p>
-                    </div>
-                    <i class="bi bi-cart3 fs-3 text-primary"></i>
-                </div>
+                        <span class="event-tag">@categoria</span>
+                        <h1 class="event-title">@evento.Nome</h1>
 
-                @if (Model.JaInscrito && Model.IdBilheteAtivo.HasValue)
-                {
-                    <div class="alert alert-info d-flex justify-content-between align-items-center gap-3">
-                        <span>Ja tens uma inscricao ativa neste evento.</span>
-                        <form asp-controller="Bilhete" asp-action="CancelarInscricao" method="post" class="mb-0">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@Model.IdBilheteAtivo.Value" />
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-x-circle"></i> Cancelar
-                            </button>
-                        </form>
+                        <h2 class="event-section-title">Informacoes do evento</h2>
+                        <div class="event-meta-list">
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">Data</span>
+                                <span class="event-meta-value">@dataEvento</span>
+                            </div>
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">Hora</span>
+                                <span class="event-meta-value">@horaEvento</span>
+                            </div>
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">Local</span>
+                                <span class="event-meta-value">@(string.IsNullOrWhiteSpace(evento.Local) ? "Local a definir" : evento.Local)</span>
+                            </div>
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">Descricao</span>
+                                <span class="event-meta-value">@(string.IsNullOrWhiteSpace(evento.Descricao) ? "Sem descricao disponivel." : evento.Descricao)</span>
+                            </div>
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">Capacidade maxima</span>
+                                <span class="event-meta-value">@capacidade</span>
+                            </div>
+                            <div class="event-meta-row">
+                                <span class="event-meta-label">Categoria</span>
+                                <span class="event-meta-value">@categoria</span>
+                            </div>
+                        </div>
                     </div>
-                }
 
-                <div class="row g-3">
-                    @foreach (var oferta in Model.OfertasBilhete)
-                    {
-                        var classesIcone = oferta.TipoBilhete switch
+                    <aside>
+                        <div class="d-flex align-items-center justify-content-between gap-3">
+                            <h2 class="event-section-title">Comprar bilhete</h2>
+                            <i class="bi bi-cart3 fs-3 text-warning"></i>
+                        </div>
+                        <p class="text-white-50 font-monospace small mt-2 mb-0">Escolhe o acesso que melhor combina com a tua experiencia.</p>
+
+                        @if (Model.JaInscrito && Model.IdBilheteAtivo.HasValue)
                         {
-                            "Gold" => "bg-warning-subtle text-warning-emphasis border border-warning-subtle",
-                            "VIP" => "bg-dark text-info border border-info-subtle",
-                            _ => "bg-primary-subtle text-primary border border-primary-subtle"
-                        };
+                            <div class="event-active-alert">
+                                <span>Ja tens uma inscricao ativa neste evento.</span>
+                                <form asp-controller="Bilhete" asp-action="CancelarInscricao" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@Model.IdBilheteAtivo.Value" />
+                                    <button type="submit" class="ticket-button">Cancelar</button>
+                                </form>
+                            </div>
+                        }
 
-                        <div class="col-12">
-                            <article class="border rounded-4 p-4 text-dark shadow-sm @(oferta.Esgotado ? "bg-light opacity-75" : "bg-white")">
-                                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <span class="rounded-circle d-inline-flex align-items-center justify-content-center @classesIcone" style="width:64px;height:64px;">
-                                            <i class="@oferta.ClasseIcone fs-3"></i>
-                                        </span>
-                                        <div>
-                                            <h5 class="mb-1 fs-4 fw-bold">@oferta.NomeBilhete</h5>
-                                            <small class="text-secondary fs-6">@oferta.TipoBilhete</small>
+                        <div class="ticket-stack">
+                            @foreach (var oferta in Model.OfertasBilhete)
+                            {
+                                var tipoNormalizado = oferta.TipoBilhete?.Trim().ToUpperInvariant();
+                                var ticketClass = tipoNormalizado switch
+                                {
+                                    "GOLD" => "ticket-gold",
+                                    "VIP" => "ticket-vip",
+                                    _ => "ticket-standard"
+                                };
+
+                                var botaoCompraClass = tipoNormalizado == "VIP" ? "ticket-button ticket-buy" : "ticket-button ticket-buy";
+                                var indisponivel = Model.JaInscrito || oferta.Esgotado;
+
+                                <article class="ticket-card @ticketClass @(indisponivel ? "ticket-disabled" : "")">
+                                    <div class="ticket-head">
+                                        <div class="ticket-name-wrap">
+                                            <span class="ticket-icon">
+                                                <i class="@oferta.ClasseIcone"></i>
+                                            </span>
+                                            <div>
+                                                <h3 class="ticket-name">@oferta.NomeBilhete</h3>
+                                                <span class="ticket-type">@oferta.TipoBilhete</span>
+                                            </div>
                                         </div>
+                                        <span class="ticket-price">@oferta.Preco.ToString("0.00") EUR</span>
                                     </div>
-                                    <span class="badge text-bg-dark fs-6 px-3 py-2 rounded-pill">@oferta.Preco.ToString("0.00") EUR</span>
-                                </div>
 
-                                <p class="mb-3 text-dark fs-5 lh-sm">@oferta.DescricaoAcesso</p>
-                                <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
-                                    <span class="fw-semibold fs-6 @(oferta.Esgotado ? "text-danger" : "text-success")">
-                                        <i class="bi bi-ticket-perforated"></i>
-                                        @if (oferta.Esgotado)
+                                    <p class="ticket-description">@oferta.DescricaoAcesso</p>
+
+                                    <div class="ticket-actions">
+                                        <span class="stock-pill">
+                                            @if (oferta.Esgotado)
+                                            {
+                                                <text>Esgotado</text>
+                                            }
+                                            else
+                                            {
+                                                <text>@oferta.QuantidadeDisponivel disponiveis</text>
+                                            }
+                                        </span>
+
+                                        @if (Model.JaInscrito)
                                         {
-                                            <text>Esgotado</text>
+                                            <button type="button" class="ticket-button" disabled>Inscricao ativa</button>
+                                        }
+                                        else if (oferta.Esgotado)
+                                        {
+                                            <button type="button" class="ticket-button" disabled>Sem disponibilidade</button>
                                         }
                                         else
                                         {
-                                            <text>@oferta.QuantidadeDisponivel disponiveis</text>
+                                            <a asp-controller="Bilhete" asp-action="Checkout" asp-route-id="@oferta.IdBilheteEvento" class="@botaoCompraClass">
+                                                Comprar
+                                            </a>
                                         }
-                                    </span>
-
-                                    @if (Model.JaInscrito)
-                                    {
-                                        <button type="button" class="btn btn-secondary px-3" disabled>Inscricao ativa</button>
-                                    }
-                                    else if (oferta.Esgotado)
-                                    {
-                                        <button type="button" class="btn btn-outline-secondary px-3" disabled>Sem disponibilidade</button>
-                                    }
-                                    else
-                                    {
-                                        <a asp-controller="Bilhete" asp-action="Checkout" asp-route-id="@oferta.IdBilheteEvento" class="btn btn-primary px-4 py-2">
-                                            <i class="bi bi-credit-card"></i> Comprar
-                                        </a>
-                                    }
-                                </div>
-                            </article>
+                                    </div>
+                                </article>
+                            }
                         </div>
-                    }
+                    </aside>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="card shadow-sm mt-4">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3 class="mb-0">Atividades</h3>
-            @if (User.IsInRole("Admin"))
-            {
-                <a asp-controller="Atividade" asp-action="Criar" asp-route-idEvento="@evento.IdEvento" class="btn btn-success">
-                    <i class="bi bi-plus-circle"></i> Adicionar atividade
-                </a>
-            }
-        </div>
+                <section class="activities-section" aria-labelledby="atividades-title">
+                    <div class="activities-toolbar">
+                        <div class="d-flex align-items-center gap-4 flex-wrap">
+                            <h2 id="atividades-title" class="event-section-title">Atividades</h2>
+                            <span class="activities-count"><span id="activityCount">@atividadesOrdenadas.Count</span> encontradas</span>
+                        </div>
 
-        @if (!evento.Atividades.Any())
-        {
-            <p class="text-muted mb-0">Este evento ainda nao tem atividades.</p>
-        }
-        else
-        {
-            <div class="table-responsive">
-                <table class="table table-striped align-middle mb-0">
-                    <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Local</th>
-                        <th>Capacidade</th>
-                        <th>Categoria</th>
-                        <th class="text-end">Acoes</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var atividade in evento.Atividades.OrderBy(a => a.Nome))
-                    {
-                        <tr>
-                            <td>@atividade.Nome</td>
-                            <td>@atividade.Local</td>
-                            <td>@atividade.Capacidade</td>
-                            <td>@atividade.IdCategoriaNavigation?.Nome</td>
-                            <td class="text-end">
-                                <a asp-controller="Atividade" asp-action="Participantes" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-outline-primary">
-                                    Participantes
+                        <div class="activity-tools">
+                            <select id="activitySort" class="activity-control" aria-label="Ordenar atividades">
+                                <option value="name_asc">A-Z</option>
+                                <option value="name_desc">Z-A</option>
+                                <option value="capacity_desc">Capacidade maior</option>
+                                <option value="capacity_asc">Capacidade menor</option>
+                            </select>
+
+                            <button type="button" id="toggleActivityFilters" class="activity-clear">
+                                <i class="bi bi-search"></i>
+                                Pesquisar
+                            </button>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-controller="Atividade" asp-action="Criar" asp-route-idEvento="@evento.IdEvento" class="admin-activity-link">
+                                    <i class="bi bi-plus-circle"></i>
+                                    Adicionar
                                 </a>
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <a asp-controller="Atividade" asp-action="Editar" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-warning">
-                                        Editar
-                                    </a>
-                                    <a asp-controller="Atividade" asp-action="ConfirmarRemocao" asp-route-id="@atividade.IdAtividade" class="btn btn-sm btn-danger">
-                                        Remover
-                                    </a>
-                                }
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
+                            }
+                        </div>
+                    </div>
+
+                    <div id="activityFilters" class="activity-filter-panel">
+                        <input id="activityNameSearch" class="activity-search" type="search" placeholder="Pesquisar por nome da atividade..." autocomplete="off" />
+                        <input id="activityLocationSearch" class="activity-search" type="search" placeholder="Pesquisar por local..." autocomplete="off" />
+                        <button type="button" id="clearActivityFilters" class="activity-clear" aria-label="Limpar filtros" title="Limpar filtros">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+
+                    <div id="activitiesList" class="activity-list">
+                        @if (!atividadesOrdenadas.Any())
+                        {
+                            <div class="empty-activities" data-empty-state>Este evento ainda nao tem atividades.</div>
+                        }
+                        else
+                        {
+                            var indice = 1;
+                            foreach (var atividade in atividadesOrdenadas)
+                            {
+                                var categoriaAtividade = atividade.IdCategoriaNavigation?.Nome ?? "Sem categoria";
+
+                                <article class="activity-row"
+                                         data-activity
+                                         data-name="@atividade.Nome.ToLowerInvariant()"
+                                         data-location="@atividade.Local.ToLowerInvariant()"
+                                         data-capacity="@atividade.Capacidade"
+                                         data-category="@categoriaAtividade.ToLowerInvariant()">
+                                    <div class="activity-main">
+                                        <span class="activity-index" data-activity-index>@indice.ToString("00")</span>
+                                        <div>
+                                            <h3 class="activity-title">@atividade.Nome</h3>
+                                            <div class="activity-details">
+                                                <span><i class="bi bi-geo-alt"></i> @atividade.Local</span>
+                                                <span><i class="bi bi-people"></i> Cap: @atividade.Capacidade</span>
+                                                <span><i class="bi bi-tag"></i> @categoriaAtividade</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-actions">
+                                        <a asp-controller="Atividade" asp-action="Participantes" asp-route-id="@atividade.IdAtividade" class="activity-action">
+                                            Participantes
+                                        </a>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-controller="Atividade" asp-action="Editar" asp-route-id="@atividade.IdAtividade" class="activity-action edit">
+                                                Editar
+                                            </a>
+                                            <a asp-controller="Atividade" asp-action="ConfirmarRemocao" asp-route-id="@atividade.IdAtividade" class="activity-action remove">
+                                                Remover
+                                            </a>
+                                        }
+                                    </div>
+                                </article>
+
+                                indice++;
+                            }
+
+                            <div class="empty-activities d-none" data-no-results>Nenhuma atividade encontrada.</div>
+                        }
+                    </div>
+                </section>
             </div>
-        }
+        </section>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (() => {
+            const rows = Array.from(document.querySelectorAll("[data-activity]"));
+            const filters = document.getElementById("activityFilters");
+            const toggleFilters = document.getElementById("toggleActivityFilters");
+            const clearFilters = document.getElementById("clearActivityFilters");
+            const nameInput = document.getElementById("activityNameSearch");
+            const locationInput = document.getElementById("activityLocationSearch");
+            const sortInput = document.getElementById("activitySort");
+            const count = document.getElementById("activityCount");
+            const list = document.getElementById("activitiesList");
+            const noResults = document.querySelector("[data-no-results]");
+
+            if (!list || rows.length === 0) {
+                return;
+            }
+
+            const normalize = value => (value || "").trim().toLowerCase();
+
+            const applyActivityFilters = () => {
+                const nameTerm = normalize(nameInput?.value);
+                const locationTerm = normalize(locationInput?.value);
+                const sortMode = sortInput?.value || "name_asc";
+
+                const sortedRows = [...rows].sort((a, b) => {
+                    const nameA = a.dataset.name || "";
+                    const nameB = b.dataset.name || "";
+                    const capacityA = Number(a.dataset.capacity || 0);
+                    const capacityB = Number(b.dataset.capacity || 0);
+
+                    if (sortMode === "name_desc") {
+                        return nameB.localeCompare(nameA);
+                    }
+
+                    if (sortMode === "capacity_desc") {
+                        return capacityB - capacityA || nameA.localeCompare(nameB);
+                    }
+
+                    if (sortMode === "capacity_asc") {
+                        return capacityA - capacityB || nameA.localeCompare(nameB);
+                    }
+
+                    return nameA.localeCompare(nameB);
+                });
+
+                let visible = 0;
+
+                sortedRows.forEach(row => {
+                    const matchesName = !nameTerm || (row.dataset.name || "").includes(nameTerm);
+                    const matchesLocation = !locationTerm || (row.dataset.location || "").includes(locationTerm);
+                    const shouldShow = matchesName && matchesLocation;
+
+                    row.classList.toggle("d-none", !shouldShow);
+                    list.appendChild(row);
+
+                    if (shouldShow) {
+                        visible += 1;
+                        const index = row.querySelector("[data-activity-index]");
+                        if (index) {
+                            index.textContent = String(visible).padStart(2, "0");
+                        }
+                    }
+                });
+
+                if (count) {
+                    count.textContent = visible;
+                }
+
+                if (noResults) {
+                    noResults.classList.toggle("d-none", visible !== 0);
+                    list.appendChild(noResults);
+                }
+            };
+
+            toggleFilters?.addEventListener("click", () => {
+                filters?.classList.toggle("is-open");
+                toggleFilters.classList.toggle("is-active", filters?.classList.contains("is-open"));
+                if (filters?.classList.contains("is-open")) {
+                    nameInput?.focus();
+                }
+            });
+
+            clearFilters?.addEventListener("click", () => {
+                if (nameInput) {
+                    nameInput.value = "";
+                }
+                if (locationInput) {
+                    locationInput.value = "";
+                }
+                applyActivityFilters();
+            });
+
+            nameInput?.addEventListener("input", applyActivityFilters);
+            locationInput?.addEventListener("input", applyActivityFilters);
+            sortInput?.addEventListener("change", applyActivityFilters);
+
+            applyActivityFilters();
+        })();
+    </script>
+}

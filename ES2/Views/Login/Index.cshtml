@@ -1,27 +1,58 @@
 @model ES2.Models.LoginModel
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-4 card p-4 shadow-sm">
-            <h2 class="text-center mb-4">Entrar</h2>
-            
-            <form asp-action="Index" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@{
+    ViewData["Title"] = "Entrar";
+}
 
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input asp-for="Email" class="form-control" placeholder="exemplo@email.com" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+<section class="eh-account-page eh-account-page--login">
+    <div class="eh-account-shell eh-account-shell--center">
+        <div class="eh-account-panel">
+            <a class="eh-account-back" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-arrow-left"></i>
+                Voltar
+            </a>
+
+            <div class="eh-account-kicker">Event Horizon</div>
+            <h1 class="eh-account-title eh-account-title--compact">Bem-vindo de volta</h1>
+            <p class="eh-account-subtitle">Entra para gerir eventos, bilhetes e atividades.</p>
+
+            <form asp-action="Index" method="post" class="eh-account-form">
+                <div asp-validation-summary="ModelOnly" class="eh-alert validation-summary-errors"></div>
+
+                <div class="eh-field">
+                    <label asp-for="Email"></label>
+                    <div class="eh-input-wrap">
+                        <i class="bi bi-envelope"></i>
+                        <input asp-for="Email" class="form-control" type="email" placeholder="teu@email.com" autocomplete="email" />
+                    </div>
+                    <span asp-validation-for="Email" class="eh-validation"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input asp-for="Password" class="form-control" type="password" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
+                <div class="eh-field">
+                    <label asp-for="Password"></label>
+                    <div class="eh-input-wrap">
+                        <i class="bi bi-lock"></i>
+                        <input asp-for="Password" class="form-control" type="password" placeholder="********" autocomplete="current-password" />
+                    </div>
+                    <span asp-validation-for="Password" class="eh-validation"></span>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                <button type="submit" class="eh-btn-primary">
+                    Entrar
+                    <i class="bi bi-arrow-right"></i>
+                </button>
             </form>
+
+            <p class="eh-auth-foot">
+                Ainda nao tens conta?
+                <a asp-controller="Registo" asp-action="Registo">Registar</a>
+            </p>
         </div>
     </div>
-</div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

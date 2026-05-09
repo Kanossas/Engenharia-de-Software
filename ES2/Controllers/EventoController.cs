@@ -13,11 +13,16 @@ public class EventoController : Controller
 {
     private readonly AppDbContext _context;
     private readonly IInscricaoEventoService _inscricaoEventoService;
+    private readonly IConfiguradorBilhetesService _configuradorBilhetesService;
 
-    public EventoController(AppDbContext context, IInscricaoEventoService inscricaoEventoService)
+    public EventoController(
+        AppDbContext context,
+        IInscricaoEventoService inscricaoEventoService,
+        IConfiguradorBilhetesService configuradorBilhetesService)
     {
         _context = context;
         _inscricaoEventoService = inscricaoEventoService;
+        _configuradorBilhetesService = configuradorBilhetesService;
     }
 
     [HttpGet]
@@ -130,7 +135,7 @@ public class EventoController : Controller
 
             _context.BilhetesEventos.Add(bilheteEvento);
             await _context.SaveChangesAsync();
-            await _inscricaoEventoService.ConfigurarBilhetesEventoAsync(
+            await _configuradorBilhetesService.ConfigurarBilhetesEventoAsync(
                 evento.IdEvento,
                 dto.Preco!.Value,
                 dto.QuantidadeStandard!.Value,
@@ -224,7 +229,7 @@ public class EventoController : Controller
         evento.CapMax = dto.Capacidade;
         evento.IdCategoria = dto.IdCategoria;
         await _context.SaveChangesAsync();
-        await _inscricaoEventoService.ConfigurarBilhetesEventoAsync(
+        await _configuradorBilhetesService.ConfigurarBilhetesEventoAsync(
             evento.IdEvento,
             dto.Preco!.Value,
             dto.QuantidadeStandard!.Value,
@@ -287,7 +292,7 @@ public class EventoController : Controller
         var dto = new EventoDetalhesCompraDto
         {
             Evento = evento,
-            OfertasBilhete = await _inscricaoEventoService.GarantirEObterOfertasAsync(evento.IdEvento),
+            OfertasBilhete = await _configuradorBilhetesService.GarantirEObterOfertasAsync(evento.IdEvento),
             JaInscrito = (await _inscricaoEventoService.ObterEventosInscritosAsync(User.Identity?.Name)).Contains(evento.IdEvento),
             IdBilheteAtivo = await _inscricaoEventoService.ObterBilheteAtivoDoEventoAsync(evento.IdEvento, User.Identity?.Name)
         };

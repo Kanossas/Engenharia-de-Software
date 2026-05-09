@@ -37,7 +37,7 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="eventosDropdown">
                                 <li>
-                                    <a class="dropdown-item" asp-controller="Evento" asp-action="Index">Ver Eventos</a>
+                                    <a class="dropdown-item" asp-controller="Home" asp-action="Index" asp-route-page="events">Ver Eventos</a>
                                 </li>
                                 @if (User.IsInRole("Admin") || User.IsInRole("Organizador"))
                                 {
