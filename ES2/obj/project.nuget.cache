@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "EM6ZWzDI9Nk=",
+  "dgSpecHash": "mkY5dJDAUsc=",
   "success": true,
-  "projectFilePath": "C:\\Users\\hugom\\RiderProjects\\Engenharia-de-Software\\ES2\\ES2.csproj",
+  "projectFilePath": "C:\\Users\\hugom\\RiderProjects\\Engenharia-de-Software\\Engenharia-de-Software\\ES2\\ES2.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hugom\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\hugom\\.nuget\\packages\\microsoft.build\\17.7.2\\microsoft.build.17.7.2.nupkg.sha512",

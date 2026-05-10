@@ -1,3 +1,4 @@
+using System.Data;
 using ES2.Data;
 using ES2.DTOs;
 using ES2.Models;
@@ -5,6 +6,7 @@ using ES2.Services.Inscricoes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ES2.Controllers;
 
@@ -121,6 +123,8 @@ public class EventoController : Controller
         {
             _context.Eventos.Add(evento);
             await _context.SaveChangesAsync();
+            await GuardarImageUrlSeExistirAsync(evento.IdEvento, dto.ImageUrl);
+            await GarantirCategoriaEventoAsync(evento.IdEvento, dto.IdCategoria);
 
             var bilheteBase = new Bilhete { Nome = "Entrada Normal" };
             _context.Bilhetes.Add(bilheteBase);
@@ -144,7 +148,7 @@ public class EventoController : Controller
             await transaction.CommitAsync();
 
             TempData["Sucesso"] = "Evento criado com sucesso.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Home", new { page = "events" });
         }
         catch
         {
@@ -229,6 +233,8 @@ public class EventoController : Controller
         evento.CapMax = dto.Capacidade;
         evento.IdCategoria = dto.IdCategoria;
         await _context.SaveChangesAsync();
+        await GuardarImageUrlSeExistirAsync(evento.IdEvento, dto.ImageUrl);
+        await GarantirCategoriaEventoAsync(evento.IdEvento, dto.IdCategoria);
         await _configuradorBilhetesService.ConfigurarBilhetesEventoAsync(
             evento.IdEvento,
             dto.Preco!.Value,
@@ -237,7 +243,7 @@ public class EventoController : Controller
             dto.QuantidadeVip!.Value);
 
         TempData["Sucesso"] = "Evento editado com sucesso.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction("Index", "Home", new { page = "events" });
     }
 
     // Só Admin e Organizador podem ver participantes
@@ -337,5 +343,85 @@ public class EventoController : Controller
         ViewBag.EventoId = idEvento;
         ViewBag.TituloFormulario = emEdicao ? "Editar Evento" : "Criar Evento";
         ViewBag.TextoBotaoSubmeter = emEdicao ? "Guardar Alteracoes" : "Criar Evento";
+    }
+
+    private async Task GarantirCategoriaEventoAsync(int idEvento, int? idCategoria)
+    {
+        if (!idCategoria.HasValue)
+            return;
+
+        var existe = await _context.CategoriaEventos
+            .AnyAsync(c => c.IdEvento == idEvento && c.IdCategoria == idCategoria.Value);
+
+        if (existe)
+            return;
+
+        _context.CategoriaEventos.Add(new CategoriaEvento
+        {
+            IdEvento = idEvento,
+            IdCategoria = idCategoria.Value
+        });
+        await _context.SaveChangesAsync();
+    }
+
+    private async Task GuardarImageUrlSeExistirAsync(int idEvento, string? imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            return;
+
+        var coluna = await TryGetEventoImageUrlColumnAsync();
+        if (string.IsNullOrWhiteSpace(coluna))
+            return;
+
+        var conn = _context.Database.GetDbConnection();
+        if (conn.State != ConnectionState.Open)
+            await conn.OpenAsync();
+
+        var safeCol = coluna.Replace("\"", "\"\"");
+        await using var cmd = conn.CreateCommand();
+        if (_context.Database.CurrentTransaction != null)
+            cmd.Transaction = _context.Database.CurrentTransaction.GetDbTransaction();
+        cmd.CommandText = $"""
+                           update "ES2"."Evento"
+                           set "{safeCol}" = @p_url
+                           where "ID_Evento" = @p_id;
+                           """;
+
+        var pUrl = cmd.CreateParameter();
+        pUrl.ParameterName = "p_url";
+        pUrl.Value = imageUrl.Trim();
+        cmd.Parameters.Add(pUrl);
+
+        var pId = cmd.CreateParameter();
+        pId.ParameterName = "p_id";
+        pId.Value = idEvento;
+        cmd.Parameters.Add(pId);
+
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    private async Task<string?> TryGetEventoImageUrlColumnAsync()
+    {
+        var conn = _context.Database.GetDbConnection();
+        if (conn.State != ConnectionState.Open)
+            await conn.OpenAsync();
+
+        await using var cmd = conn.CreateCommand();
+        if (_context.Database.CurrentTransaction != null)
+            cmd.Transaction = _context.Database.CurrentTransaction.GetDbTransaction();
+        cmd.CommandText = """
+                          select column_name
+                          from information_schema.columns
+                          where table_schema ilike 'ES2'
+                            and table_name ilike 'Evento'
+                            and (
+                              lower(column_name) in ('imageurl', 'image_url')
+                              or lower(column_name) like '%image%url%'
+                            )
+                          limit 1;
+                          """;
+
+        var result = await cmd.ExecuteScalarAsync();
+        return result as string;
     }
 }

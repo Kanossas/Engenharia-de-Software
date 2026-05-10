@@ -348,8 +348,20 @@ public class AtividadeController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Criar(CriarAtividadeDto dto)
     {
+        if (dto.IdCategoria is null && string.IsNullOrWhiteSpace(dto.NovaCategoriaNome))
+            ModelState.AddModelError(nameof(dto.IdCategoria), "A categoria e obrigatoria.");
+
         if (!ModelState.IsValid)
         {
+            ViewBag.Categorias = await _categoriaRepository.GetAllAsync();
+            ViewBag.EventoId = dto.IdEvento;
+            return View("CriarAtividade", dto);
+        }
+
+        var categoria = await ObterOuCriarCategoriaAsync(dto.IdEvento, dto.IdCategoria, dto.NovaCategoriaNome);
+        if (categoria == null)
+        {
+            ModelState.AddModelError(nameof(dto.IdCategoria), "A categoria selecionada nao existe.");
             ViewBag.Categorias = await _categoriaRepository.GetAllAsync();
             ViewBag.EventoId = dto.IdEvento;
             return View("CriarAtividade", dto);
@@ -361,7 +373,7 @@ public class AtividadeController : Controller
             Nome = dto.Nome,
             Local = dto.Local,
             Capacidade = dto.Capacidade,
-            IdCategoria = dto.IdCategoria
+            IdCategoria = categoria.IdCategoria
         };
 
         // ISP: operação de escrita usa IAtividadeWriteRepository
@@ -369,5 +381,47 @@ public class AtividadeController : Controller
 
         TempData["Sucesso"] = "Atividade criada com sucesso!";
         return RedirectToAction("Detalhes", "Evento", new { id = dto.IdEvento });
+    }
+
+    private async Task<Categoria?> ObterOuCriarCategoriaAsync(int idEvento, int? idCategoria, string? novaCategoriaNome)
+    {
+        var nome = novaCategoriaNome?.Trim();
+        Categoria? categoria;
+
+        if (!string.IsNullOrWhiteSpace(nome))
+        {
+            categoria = await _context.Categorias
+                .FirstOrDefaultAsync(c => c.Nome.ToLower() == nome.ToLower());
+
+            if (categoria == null)
+            {
+                categoria = new Categoria { Nome = nome };
+                _context.Categorias.Add(categoria);
+                await _context.SaveChangesAsync();
+            }
+        }
+        else
+        {
+            categoria = await _context.Categorias
+                .FirstOrDefaultAsync(c => c.IdCategoria == idCategoria!.Value);
+        }
+
+        if (categoria == null)
+            return null;
+
+        var temCategoriaEvento = await _context.CategoriaEventos
+            .AnyAsync(c => c.IdEvento == idEvento && c.IdCategoria == categoria.IdCategoria);
+
+        if (!temCategoriaEvento)
+        {
+            _context.CategoriaEventos.Add(new CategoriaEvento
+            {
+                IdEvento = idEvento,
+                IdCategoria = categoria.IdCategoria
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        return categoria;
     }
 }

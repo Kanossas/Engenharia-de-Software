@@ -51,6 +51,9 @@ public class CriarEventoDto : IValidatableObject
     [StringLength(100, ErrorMessage = "O nome da nova categoria nao pode ter mais de 100 caracteres.")]
     public string? NovaCategoria { get; set; }
 
+    [StringLength(500, ErrorMessage = "O URL da imagem nao pode ter mais de 500 caracteres.")]
+    public string? ImageUrl { get; set; }
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (!Capacidade.HasValue)

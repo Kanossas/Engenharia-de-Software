@@ -164,6 +164,30 @@ public class EventosApiController : ControllerBase
     [HttpGet("{id:int}/atividades")]
     public async Task<IActionResult> ListarAtividades(int id, CancellationToken ct)
     {
+        var nomeUtilizador = User.Identity?.Name;
+        var utilizador = string.IsNullOrWhiteSpace(nomeUtilizador)
+            ? null
+            : await _context.Utilizadores.FirstOrDefaultAsync(u => u.Nome == nomeUtilizador, ct);
+
+        var idsInscritos = new HashSet<int>();
+        var acessoAutomaticoAtividades = false;
+
+        if (utilizador != null)
+        {
+            acessoAutomaticoAtividades = await UtilizadorTemBilheteComAcessoAtividadesAsync(utilizador.IdUti, id, ct);
+
+            if (acessoAutomaticoAtividades)
+                await GarantirRegistoAtividadesAsync(utilizador.IdUti, id, ct);
+
+            idsInscritos = (await _context.RegistoAtividades
+                    .Where(r => r.IdUti == utilizador.IdUti &&
+                                !r.IsCancelado &&
+                                r.IdAtividadeNavigation.IdEvento == id)
+                    .Select(r => r.IdAtividade)
+                    .ToListAsync(ct))
+                .ToHashSet();
+        }
+
         var atividades = await _context.Atividades
             .Include(a => a.IdCategoriaNavigation)
             .Where(a => a.IdEvento == id)
@@ -174,11 +198,124 @@ public class EventosApiController : ControllerBase
                 nome = a.Nome,
                 local = a.Local,
                 capacidade = a.Capacidade,
-                categoria = new { id = a.IdCategoria, nome = a.IdCategoriaNavigation.Nome }
+                categoria = new { id = a.IdCategoria, nome = a.IdCategoriaNavigation.Nome },
+                inscrito = idsInscritos.Contains(a.IdAtividade),
+                acessoAutomatico = acessoAutomaticoAtividades
             })
             .ToListAsync(ct);
 
         return Ok(atividades);
+    }
+
+    [Authorize]
+    [HttpPost("{id:int}/atividades/{atividadeId:int}/inscricao")]
+    public async Task<IActionResult> InscreverAtividade(int id, int atividadeId, CancellationToken ct)
+    {
+        var resultado = await AlterarInscricaoAtividadeAsync(id, atividadeId, inscrever: true, ct);
+        return resultado.Sucesso
+            ? Ok(new { message = resultado.Mensagem })
+            : BadRequest(new { message = resultado.Mensagem });
+    }
+
+    [Authorize]
+    [HttpDelete("{id:int}/atividades/{atividadeId:int}/inscricao")]
+    public async Task<IActionResult> CancelarInscricaoAtividade(int id, int atividadeId, CancellationToken ct)
+    {
+        var resultado = await AlterarInscricaoAtividadeAsync(id, atividadeId, inscrever: false, ct);
+        return resultado.Sucesso
+            ? Ok(new { message = resultado.Mensagem })
+            : BadRequest(new { message = resultado.Mensagem });
+    }
+
+    public sealed class CriarAtividadeRequest
+    {
+        public string Nome { get; set; } = string.Empty;
+        public string Local { get; set; } = string.Empty;
+        public int? Capacidade { get; set; }
+        public int? IdCategoria { get; set; }
+        public string? NovaCategoriaNome { get; set; }
+    }
+
+    [Authorize]
+    [HttpPost("{id:int}/atividades")]
+    public async Task<IActionResult> CriarAtividade(int id, [FromBody] CriarAtividadeRequest req, CancellationToken ct)
+    {
+        var existeEvento = await _context.Eventos.AnyAsync(e => e.IdEvento == id, ct);
+        if (!existeEvento)
+            return NotFound(new { message = "O evento selecionado nao existe." });
+
+        if (string.IsNullOrWhiteSpace(req.Nome))
+            return BadRequest(new { message = "O nome da atividade e obrigatorio." });
+
+        if (string.IsNullOrWhiteSpace(req.Local))
+            return BadRequest(new { message = "O local da atividade e obrigatorio." });
+
+        if (req.Capacidade is null or <= 0)
+            return BadRequest(new { message = "A capacidade deve ser superior a 0." });
+
+        var novaCategoriaNome = req.NovaCategoriaNome?.Trim();
+        if (req.IdCategoria is null && string.IsNullOrWhiteSpace(novaCategoriaNome))
+            return BadRequest(new { message = "A categoria e obrigatoria." });
+
+        if (!string.IsNullOrWhiteSpace(novaCategoriaNome) && novaCategoriaNome.Length > 40)
+            return BadRequest(new { message = "A nova categoria nao pode ter mais de 40 caracteres." });
+
+        Categoria? categoria;
+        if (!string.IsNullOrWhiteSpace(novaCategoriaNome))
+        {
+            categoria = await _context.Categorias
+                .FirstOrDefaultAsync(c => c.Nome.ToLower() == novaCategoriaNome.ToLower(), ct)
+                ?? new Categoria { Nome = novaCategoriaNome };
+
+            if (categoria.IdCategoria == 0)
+            {
+                _context.Categorias.Add(categoria);
+                await _context.SaveChangesAsync(ct);
+            }
+        }
+        else
+        {
+            categoria = await _context.Categorias
+                .FirstOrDefaultAsync(c => c.IdCategoria == req.IdCategoria!.Value, ct);
+
+            if (categoria == null)
+                return BadRequest(new { message = "A categoria selecionada nao existe." });
+        }
+
+        var temCategoriaEvento = await _context.CategoriaEventos
+            .AnyAsync(c => c.IdEvento == id && c.IdCategoria == categoria.IdCategoria, ct);
+
+        if (!temCategoriaEvento)
+        {
+            _context.CategoriaEventos.Add(new CategoriaEvento
+            {
+                IdEvento = id,
+                IdCategoria = categoria.IdCategoria
+            });
+        }
+
+        var atividade = new Atividade
+        {
+            IdEvento = id,
+            Nome = req.Nome.Trim(),
+            Local = req.Local.Trim(),
+            Capacidade = req.Capacidade.Value,
+            IdCategoria = categoria.IdCategoria
+        };
+
+        _context.Atividades.Add(atividade);
+        await _context.SaveChangesAsync(ct);
+
+        return Ok(new
+        {
+            id = atividade.IdAtividade,
+            nome = atividade.Nome,
+            local = atividade.Local,
+            capacidade = atividade.Capacidade,
+            categoria = new { id = categoria.IdCategoria, nome = categoria.Nome },
+            inscrito = false,
+            acessoAutomatico = false
+        });
     }
 
     public sealed class CriarEventoRequest
@@ -310,5 +447,123 @@ public class EventosApiController : ControllerBase
             await tx.RollbackAsync(ct);
             return Problem("Nao foi possivel criar o evento.");
         }
+    }
+
+    private async Task<(bool Sucesso, string Mensagem)> AlterarInscricaoAtividadeAsync(
+        int eventoId,
+        int atividadeId,
+        bool inscrever,
+        CancellationToken ct)
+    {
+        var nomeUtilizador = User.Identity?.Name;
+        if (string.IsNullOrWhiteSpace(nomeUtilizador))
+            return (false, "Nao foi possivel identificar o utilizador autenticado.");
+
+        var utilizador = await _context.Utilizadores
+            .FirstOrDefaultAsync(u => u.Nome == nomeUtilizador, ct);
+
+        if (utilizador == null)
+            return (false, "Nao foi possivel identificar o utilizador autenticado.");
+
+        if (await UtilizadorTemBilheteComAcessoAtividadesAsync(utilizador.IdUti, eventoId, ct))
+            return (false, "As atividades ja estao incluidas automaticamente no teu bilhete Gold/VIP.");
+
+        var atividade = await _context.Atividades
+            .FirstOrDefaultAsync(a => a.IdAtividade == atividadeId && a.IdEvento == eventoId, ct);
+
+        if (atividade == null)
+            return (false, "A atividade selecionada nao existe.");
+
+        var registo = await _context.RegistoAtividades
+            .FirstOrDefaultAsync(r => r.IdUti == utilizador.IdUti && r.IdAtividade == atividadeId, ct);
+
+        if (inscrever)
+        {
+            if (registo != null && !registo.IsCancelado)
+                return (false, "Ja estas inscrito nesta atividade.");
+
+            var inscritosAtivos = await _context.RegistoAtividades
+                .CountAsync(r => r.IdAtividade == atividadeId && !r.IsCancelado, ct);
+
+            if (inscritosAtivos >= atividade.Capacidade)
+                return (false, "Esta atividade ja atingiu a capacidade maxima.");
+
+            if (registo == null)
+            {
+                _context.RegistoAtividades.Add(new RegistoAtividade
+                {
+                    IdUti = utilizador.IdUti,
+                    IdAtividade = atividadeId,
+                    IsCancelado = false
+                });
+            }
+            else
+            {
+                registo.IsCancelado = false;
+            }
+
+            await _context.SaveChangesAsync(ct);
+            return (true, $"Inscricao na atividade '{atividade.Nome}' efetuada com sucesso.");
+        }
+
+        if (registo == null || registo.IsCancelado)
+            return (false, "Nao tens uma inscricao ativa nesta atividade.");
+
+        registo.IsCancelado = true;
+        await _context.SaveChangesAsync(ct);
+
+        return (true, "Inscricao na atividade cancelada com sucesso.");
+    }
+
+    private async Task<bool> UtilizadorTemBilheteComAcessoAtividadesAsync(int utilizadorId, int eventoId, CancellationToken ct)
+    {
+        var temEventoAtivo = await _context.RegistoEventos.AnyAsync(r =>
+            r.IdUti == utilizadorId &&
+            r.IdEvento == eventoId &&
+            !r.IsCancelado, ct);
+
+        if (!temEventoAtivo)
+            return false;
+
+        var tipoBilhete = await _context.BilheteUtils
+            .Where(bu => bu.IdUtilizador == utilizadorId &&
+                         bu.IdBiEvNavigation != null &&
+                         bu.IdBiEvNavigation.IdEvento == eventoId)
+            .OrderByDescending(bu => bu.IdBiUti)
+            .Select(bu => bu.IdBiEvNavigation!.IdBilheteNavigation.IdTipoNavigation!.Nome)
+            .FirstOrDefaultAsync(ct);
+
+        return string.Equals(tipoBilhete, "Gold", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(tipoBilhete, "VIP", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task GarantirRegistoAtividadesAsync(int utilizadorId, int eventoId, CancellationToken ct)
+    {
+        var atividades = await _context.Atividades
+            .Where(a => a.IdEvento == eventoId)
+            .Select(a => a.IdAtividade)
+            .ToListAsync(ct);
+
+        foreach (var atividadeId in atividades)
+        {
+            var registo = await _context.RegistoAtividades
+                .FirstOrDefaultAsync(r => r.IdUti == utilizadorId && r.IdAtividade == atividadeId, ct);
+
+            if (registo == null)
+            {
+                _context.RegistoAtividades.Add(new RegistoAtividade
+                {
+                    IdUti = utilizadorId,
+                    IdAtividade = atividadeId,
+                    IsCancelado = false
+                });
+            }
+            else
+            {
+                registo.IsCancelado = false;
+            }
+        }
+
+        await _context.SaveChangesAsync(ct);
     }
 }

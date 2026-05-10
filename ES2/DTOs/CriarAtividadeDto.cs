@@ -18,6 +18,8 @@ public class CriarAtividadeDto
     [Range(1, 100000, ErrorMessage = "A capacidade tem de ser maior que 0")]
     public int Capacidade { get; set; }
 
-    [Required(ErrorMessage = "A categoria é obrigatória")]
-    public int IdCategoria { get; set; }
+    public int? IdCategoria { get; set; }
+
+    [StringLength(40, ErrorMessage = "A nova categoria nao pode ter mais de 40 caracteres")]
+    public string? NovaCategoriaNome { get; set; }
 }

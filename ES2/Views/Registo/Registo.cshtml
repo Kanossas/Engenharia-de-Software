@@ -2,11 +2,13 @@
 
 @{
     ViewData["Title"] = "Registo";
+    ViewData["FullBleed"] = true;
+    ViewData["HideFooter"] = true;
 }
 
-<section class="eh-account-page">
+<section class="eh-account-page eh-account-page--register">
     <div class="eh-account-shell eh-account-shell--center">
-        <div class="eh-account-panel">
+        <div class="eh-account-panel eh-account-panel--register">
             <a class="eh-account-back" asp-controller="Home" asp-action="Index">
                 <i class="bi bi-arrow-left"></i>
                 Voltar
@@ -16,7 +18,7 @@
             <h1 class="eh-account-title eh-account-title--compact">Cria a tua conta</h1>
             <p class="eh-account-subtitle">Preenche os dados para acederes ao universo Event Horizon.</p>
 
-            <form asp-action="Registo" method="post" class="eh-account-form">
+            <form asp-action="Registo" method="post" class="eh-account-form eh-account-form--register">
                 <div asp-validation-summary="ModelOnly" class="eh-alert validation-summary-errors"></div>
 
                 <div class="eh-field">
@@ -64,7 +66,7 @@
                     <span asp-validation-for="CodigoPostalInput" class="eh-validation"></span>
                 </div>
 
-                <button type="submit" class="eh-btn-primary">
+                <button type="submit" class="eh-btn-primary eh-register-submit">
                     Registar
                     <i class="bi bi-arrow-right"></i>
                 </button>

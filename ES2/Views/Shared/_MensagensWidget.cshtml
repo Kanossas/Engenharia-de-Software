@@ -1,0 +1,26 @@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+    var tokens = Antiforgery.GetAndStoreTokens(Context);
+}
+
+<div id="eh-msg-widget" class="eh-msg-widget" data-csrf="@tokens.RequestToken">
+    <button type="button" id="eh-msg-toggle" class="eh-msg-toggle" aria-expanded="false" aria-controls="eh-msg-panel" title="Mensagens">
+        <i class="bi bi-bell-fill"></i>
+        <span id="eh-msg-badge" class="eh-msg-badge eh-msg-hidden">0</span>
+    </button>
+
+    <div id="eh-msg-panel" class="eh-msg-panel eh-msg-hidden" role="dialog" aria-label="Mensagens">
+        <div class="eh-msg-panel-header">
+            <div class="eh-msg-panel-title">Mensagens</div>
+            <button type="button" id="eh-msg-close" class="eh-msg-close" aria-label="Fechar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div id="eh-msg-list" class="eh-msg-list">
+            <div class="eh-msg-empty">Sem notificações.</div>
+        </div>
+    </div>
+</div>
+

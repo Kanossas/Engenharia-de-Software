@@ -2,158 +2,228 @@
 
 @{
     ViewData["Title"] = ViewBag.TituloFormulario ?? "Criar Evento";
+    ViewData["FullBleed"] = true;
+    ViewData["HideFooter"] = true;
     var categorias = ViewBag.Categorias as IEnumerable<ES2.Models.Categoria> ?? Enumerable.Empty<ES2.Models.Categoria>();
     var emEdicao = ViewBag.EmEdicao != null && (bool)ViewBag.EmEdicao;
+    var titulo = ViewBag.TituloFormulario as string ?? "Criar Evento";
+    var textoBotao = ViewBag.TextoBotaoSubmeter as string ?? "Criar Evento";
 }
 
-<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-    <div>
-        <h2 class="mb-1">@ViewBag.TituloFormulario</h2>
-        <p class="text-muted mb-0">O sistema vai gerar automaticamente os bilhetes Standard, Gold e VIP a partir deste evento.</p>
-    </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Voltar
-    </a>
-</div>
+<section class="eh-create-event-page">
+    <div class="eh-event-shell">
+        <div class="eh-event-header">
+            <a class="eh-account-back" asp-controller="Home" asp-action="Index" asp-route-page="events">
+                <i class="bi bi-arrow-left"></i>
+                Voltar
+            </a>
+            <h1>@titulo</h1>
+        </div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <form asp-action="@ViewBag.FormAction" asp-route-id="@ViewBag.EventoId" method="post" class="row g-3">
+        <form asp-action="@ViewBag.FormAction" asp-route-id="@ViewBag.EventoId" method="post" class="eh-event-form">
             @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="eh-alert validation-summary-errors"></div>
 
-            <div class="col-md-6">
-                <label asp-for="Nome" class="form-label">Nome do evento</label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
+            <div class="eh-event-column">
+                <div class="eh-event-grid eh-event-grid--four">
+                    <div class="eh-event-field eh-span-2">
+                        <label asp-for="Nome">Nome do evento</label>
+                        <input asp-for="Nome" placeholder="Ex: Holy Priest Rave" />
+                        <span asp-validation-for="Nome" class="eh-validation"></span>
+                    </div>
 
-            <div class="col-md-3">
-                <label asp-for="Data" class="form-label">Data</label>
-                <input asp-for="Data" class="form-control" type="date" />
-                <span asp-validation-for="Data" class="text-danger"></span>
-            </div>
+                    <div class="eh-event-field">
+                        <label asp-for="Data">Data</label>
+                        <div class="eh-event-input-icon">
+                            <input asp-for="Data" type="date" />
+                            <i class="bi bi-calendar3"></i>
+                        </div>
+                        <span asp-validation-for="Data" class="eh-validation"></span>
+                    </div>
 
-            <div class="col-md-3">
-                <label asp-for="HoraInicio" class="form-label">Hora</label>
-                <input asp-for="HoraInicio" class="form-control" type="time" />
-                <span asp-validation-for="HoraInicio" class="text-danger"></span>
-            </div>
+                    <div class="eh-event-field">
+                        <label asp-for="HoraInicio">Hora</label>
+                        <div class="eh-event-input-icon">
+                            <input asp-for="HoraInicio" type="time" />
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <span asp-validation-for="HoraInicio" class="eh-validation"></span>
+                    </div>
+                </div>
 
-            <div class="col-md-6">
-                <label asp-for="Local" class="form-label">Local</label>
-                <input asp-for="Local" class="form-control" />
-                <span asp-validation-for="Local" class="text-danger"></span>
-            </div>
+                <div class="eh-event-grid eh-event-grid--four">
+                    <div class="eh-event-field eh-span-2">
+                        <label asp-for="Local">Local</label>
+                        <input asp-for="Local" placeholder="Ex: Porto" />
+                        <span asp-validation-for="Local" class="eh-validation"></span>
+                    </div>
 
-            <div class="col-md-3">
-                <label asp-for="Capacidade" class="form-label">Capacidade maxima</label>
-                <input asp-for="Capacidade" class="form-control" type="number" min="1" />
-                <span asp-validation-for="Capacidade" class="text-danger"></span>
-            </div>
+                    <div class="eh-event-field">
+                        <label asp-for="Capacidade">Capacidade maxima</label>
+                        <input asp-for="Capacidade" type="number" min="1" />
+                        <span asp-validation-for="Capacidade" class="eh-validation"></span>
+                    </div>
 
-            <div class="col-md-3">
-                <label asp-for="Preco" class="form-label">Preco base</label>
-                <input asp-for="Preco" class="form-control" type="number" step="0.01" min="0" />
-                <span asp-validation-for="Preco" class="text-danger"></span>
-            </div>
+                    <div class="eh-event-field">
+                        <label asp-for="Preco">Preco base</label>
+                        <input asp-for="Preco" type="number" step="0.01" min="0" />
+                        <span asp-validation-for="Preco" class="eh-validation"></span>
+                    </div>
+                </div>
 
-            <div class="col-md-4">
-                <label asp-for="QuantidadeStandard" class="form-label">Bilhetes Standard</label>
-                <input asp-for="QuantidadeStandard" class="form-control" type="number" min="0" />
-                <span asp-validation-for="QuantidadeStandard" class="text-danger"></span>
-            </div>
+                <div class="eh-event-grid eh-event-grid--three">
+                    <div class="eh-event-field">
+                        <label asp-for="QuantidadeStandard">Bilhetes Standard</label>
+                        <input asp-for="QuantidadeStandard" type="number" min="0" />
+                        <span asp-validation-for="QuantidadeStandard" class="eh-validation"></span>
+                    </div>
 
-            <div class="col-md-4">
-                <label asp-for="QuantidadeGold" class="form-label">Bilhetes Gold</label>
-                <input asp-for="QuantidadeGold" class="form-control" type="number" min="0" />
-                <span asp-validation-for="QuantidadeGold" class="text-danger"></span>
-            </div>
+                    <div class="eh-event-field">
+                        <label asp-for="QuantidadeGold">Bilhetes Gold</label>
+                        <input asp-for="QuantidadeGold" type="number" min="0" />
+                        <span asp-validation-for="QuantidadeGold" class="eh-validation"></span>
+                    </div>
 
-            <div class="col-md-4">
-                <label asp-for="QuantidadeVip" class="form-label">Bilhetes VIP</label>
-                <input asp-for="QuantidadeVip" class="form-control" type="number" min="0" />
-                <span asp-validation-for="QuantidadeVip" class="text-danger"></span>
-            </div>
+                    <div class="eh-event-field">
+                        <label asp-for="QuantidadeVip">Bilhetes VIP</label>
+                        <input asp-for="QuantidadeVip" type="number" min="0" />
+                        <span asp-validation-for="QuantidadeVip" class="eh-validation"></span>
+                    </div>
+                </div>
 
-            <div class="col-12">
-                <label asp-for="IdCategoria" class="form-label">Categoria</label>
-                <select asp-for="IdCategoria" class="form-select">
-                    <option value="">Seleciona uma categoria</option>
-                    @foreach (var categoria in categorias)
-                    {
-                        <option value="@categoria.IdCategoria">@categoria.Nome</option>
-                    }
-                </select>
-                <span asp-validation-for="IdCategoria" class="text-danger"></span>
-            </div>
-
-            <div class="col-12">
-                <button type="button" class="btn btn-outline-primary btn-sm" id="toggleNovaCategoria">
-                    <i class="bi bi-plus-circle"></i> Criar Nova
-                </button>
-            </div>
-
-            <div class="col-12 d-none" id="blocoNovaCategoria">
-                <label asp-for="NovaCategoria" class="form-label">Nova categoria</label>
-                <input asp-for="NovaCategoria" class="form-control" placeholder="Escreve o nome da nova categoria" />
-                <span asp-validation-for="NovaCategoria" class="text-danger"></span>
-            </div>
-
-            <div class="col-12">
-                <label asp-for="Descricao" class="form-label">Descricao</label>
-                <textarea asp-for="Descricao" class="form-control" rows="5"></textarea>
-                <span asp-validation-for="Descricao" class="text-danger"></span>
-            </div>
-
-            <div class="col-12">
-                <div class="alert alert-info mb-0">
-                    <strong>Regras dos bilhetes:</strong> Standard para acesso ao evento, Gold para evento + todas as atividades, e VIP para evento + atividades + zonas restritas. A soma das quantidades nao pode ultrapassar a capacidade maxima.
+                <div class="eh-event-field">
+                    <label asp-for="IdCategoria">Categoria</label>
+                    <div class="eh-event-select-wrap">
+                        <select asp-for="IdCategoria">
+                            <option value="">Seleciona uma categoria</option>
+                            @foreach (var categoria in categorias)
+                            {
+                                <option value="@categoria.IdCategoria">@categoria.Nome</option>
+                            }
+                            <option value="__nova__">+ adicionar categoria</option>
+                        </select>
+                        <input asp-for="NovaCategoria" class="d-none" placeholder="Nome da nova categoria" />
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <span asp-validation-for="IdCategoria" class="eh-validation"></span>
+                    <span asp-validation-for="NovaCategoria" class="eh-validation"></span>
                 </div>
             </div>
 
-            <div class="col-12 d-flex justify-content-end gap-2">
-                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-                <button type="submit" class="btn btn-primary">@ViewBag.TextoBotaoSubmeter</button>
+            <div class="eh-event-column eh-event-column--media">
+                <div class="eh-event-field">
+                    <label asp-for="Descricao">Descricao</label>
+                    <textarea asp-for="Descricao" rows="6"></textarea>
+                    <span asp-validation-for="Descricao" class="eh-validation"></span>
+                </div>
+
+                <div class="eh-event-image-block">
+                    <div class="eh-event-field">
+                        <label asp-for="ImageUrl">URL da imagem</label>
+                        <input asp-for="ImageUrl" placeholder="https://exemplo.com/imagem.jpg" />
+                        <span asp-validation-for="ImageUrl" class="eh-validation"></span>
+                    </div>
+                    <div class="eh-event-image-preview" id="imagePreview">
+                        <img alt="Preview da imagem do evento" />
+                        <div class="eh-event-image-empty">
+                            <i class="bi bi-image"></i>
+                            <span>Preview da imagem</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="eh-rules-button" data-bs-toggle="modal" data-bs-target="#regrasBilhetesModal">
+                    <i class="bi bi-info-circle"></i>
+                    Consultar Regras dos Bilhetes
+                </button>
+            </div>
+
+            <div class="eh-event-actions">
+                <a asp-controller="Home" asp-action="Index" asp-route-page="events" class="eh-btn-secondary">Cancelar</a>
+                <button type="submit" class="eh-btn-primary">@textoBotao</button>
             </div>
         </form>
+    </div>
+</section>
+
+<div class="modal fade eh-rules-modal" id="regrasBilhetesModal" tabindex="-1" aria-labelledby="regrasBilhetesTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <button type="button" class="eh-modal-close" data-bs-dismiss="modal" aria-label="Fechar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="regrasBilhetesTitulo">
+                    <i class="bi bi-info-circle"></i>
+                    Regras dos Bilhetes
+                </h2>
+            </div>
+            <div class="modal-body">
+                <h3>Standard</h3>
+                <p>Para acesso ao evento apenas.</p>
+                <h3 class="eh-text-yellow">Gold</h3>
+                <p>Para evento + todas as atividades.</p>
+                <h3 class="eh-text-indigo">VIP</h3>
+                <p>Para evento + atividades + zonas restritas.</p>
+                <div class="eh-rules-warning">
+                    A soma das quantidades de todos os bilhetes nao pode ultrapassar a capacidade maxima do evento.
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        const toggleNovaCategoria = document.getElementById('toggleNovaCategoria');
-        const blocoNovaCategoria = document.getElementById('blocoNovaCategoria');
-        const inputNovaCategoria = document.getElementById('NovaCategoria');
-        const selectCategoria = document.getElementById('IdCategoria');
+        (() => {
+            const select = document.getElementById("IdCategoria");
+            const input = document.getElementById("NovaCategoria");
+            const chevron = select?.parentElement?.querySelector(".bi-chevron-down");
+            const imageInput = document.getElementById("ImageUrl");
+            const preview = document.getElementById("imagePreview");
+            const previewImg = preview?.querySelector("img");
 
-        function atualizarBlocoNovaCategoria(mostrar) {
-            blocoNovaCategoria.classList.toggle('d-none', !mostrar);
-            toggleNovaCategoria.innerHTML = mostrar
-                ? '<i class="bi bi-dash-circle"></i> Fechar Nova Categoria'
-                : '<i class="bi bi-plus-circle"></i> Criar Nova';
+            const toggleNewCategory = () => {
+                const isNew = select?.value === "__nova__" || (input?.value?.trim() && !select?.value);
+                select?.classList.toggle("d-none", !!isNew);
+                input?.classList.toggle("d-none", !isNew);
+                chevron?.classList.toggle("d-none", !!isNew);
+                if (input) {
+                    input.disabled = !isNew;
+                    if (isNew) {
+                        input.focus();
+                    } else {
+                        input.value = "";
+                    }
+                }
+            };
 
-            if (mostrar) {
-                selectCategoria.value = '';
-                inputNovaCategoria.focus();
-            } else {
-                inputNovaCategoria.value = '';
-            }
-        }
+            const updateImagePreview = () => {
+                const value = imageInput?.value?.trim();
+                if (!preview || !previewImg) {
+                    return;
+                }
 
-        toggleNovaCategoria.addEventListener('click', () => {
-            atualizarBlocoNovaCategoria(blocoNovaCategoria.classList.contains('d-none'));
-        });
+                preview.classList.toggle("has-image", !!value);
+                if (value) {
+                    previewImg.src = value;
+                } else {
+                    previewImg.removeAttribute("src");
+                }
+            };
 
-        selectCategoria.addEventListener('change', () => {
-            if (selectCategoria.value) {
-                atualizarBlocoNovaCategoria(false);
-            }
-        });
+            select?.addEventListener("change", toggleNewCategory);
+            select?.form?.addEventListener("submit", () => {
+                if (select.value === "__nova__") {
+                    select.disabled = true;
+                }
+            });
+            imageInput?.addEventListener("input", updateImagePreview);
+            previewImg?.addEventListener("error", () => preview?.classList.remove("has-image"));
 
-        if (inputNovaCategoria.value.trim() !== '') {
-            atualizarBlocoNovaCategoria(true);
-        }
+            toggleNewCategory();
+            updateImagePreview();
+        })();
     </script>
 }

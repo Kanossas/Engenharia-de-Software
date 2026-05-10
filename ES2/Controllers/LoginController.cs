@@ -28,25 +28,18 @@ public class LoginController : Controller
     {
         if (ModelState.IsValid)
         {
+            // Procura o utilizador pelo email
             var user = await _context.Utilizadores
                 .FirstOrDefaultAsync(u => u.Email == model.Email);
 
             var hasher = new PasswordHasher<Utilizador>();
             if (user != null && hasher.VerifyHashedPassword(user, user.Password, model.Password) != PasswordVerificationResult.Failed)
             {
-                var role = user.TipoUti switch
-                {
-                    1 => "Admin",
-                    3 => "Organizador",
-                    _ => "Utilizador"
-                };
-
+                // 1. Criamos os dados que o site vai "lembrar"
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.Nome),
-                    new Claim(ClaimTypes.Email, user.Email ?? ""),
-                    new Claim(ClaimTypes.NameIdentifier, user.IdUti.ToString()),
-                    new Claim(ClaimTypes.Role, role)
+                    new Claim(ClaimTypes.Role, user.TipoUti == 1 ? "Admin" : "Utilizador")
                 };
 
                 var identity = new ClaimsIdentity(claims, "CookieAuth");

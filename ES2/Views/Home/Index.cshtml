@@ -8,6 +8,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Event Horizon</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/mensagens-widget.css" asp-append-version="true" />
     <script>
         const initialPage = new URLSearchParams(window.location.search).get("page");
         window.__EH_INITIAL_PAGE__ = initialPage === "events" ? "events" : "home";
@@ -17,5 +19,11 @@
 </head>
 <body>
 <div id="root"></div>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <partial name="_MensagensWidget" />
+    <script src="~/js/mensagens-widget.js" asp-append-version="true"></script>
+}
 </body>
 </html>

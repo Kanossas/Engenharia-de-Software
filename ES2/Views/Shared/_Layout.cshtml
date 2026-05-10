@@ -1,4 +1,9 @@
 ﻿<!DOCTYPE html>
+@{
+    var hideChrome = ViewData["HideChrome"] is true;
+    var hideFooter = ViewData["HideFooter"] is true;
+    var fullBleed = hideChrome || ViewData["FullBleed"] is true;
+}
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -8,9 +13,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/mensagens-widget.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/ES2.styles.css" asp-append-version="true"/>
 </head>
-<body>
+<body class="@(hideChrome ? "eh-shellless" : "")">
+@if (!hideChrome)
+{
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark mb-3 shadow-sm">
         <div class="container-fluid">
@@ -109,20 +117,30 @@
         </div>
     </nav>
 </header>
-<div class="container">
-    <main role="main" class="pb-3">
+}
+<div class="@(fullBleed ? "eh-full-bleed" : "container")">
+    <main role="main" class="@(fullBleed || hideFooter ? "" : "pb-3")">
         @RenderBody()
     </main>
 </div>
 
+@if (!hideChrome && !hideFooter)
+{
 <footer class="footer">
     <div class="container text-white">
         &copy; 2026 - ES2 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
     </div>
 </footer>
+}
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <partial name="_MensagensWidget" />
+}
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/mensagens-widget.js" asp-append-version="true"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

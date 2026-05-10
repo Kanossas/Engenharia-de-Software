@@ -44,8 +44,11 @@
                     {
                         <option value="@cat.IdCategoria">@cat.Nome</option>
                     }
+                    <option value="__nova__">+ adicionar atividade</option>
                 </select>
+                <input asp-for="NovaCategoriaNome" class="form-control d-none" placeholder="Nome da nova categoria" />
                 <span asp-validation-for="IdCategoria" class="text-danger"></span>
+                <span asp-validation-for="NovaCategoriaNome" class="text-danger"></span>
             </div>
 
             <div class="d-flex gap-2">
@@ -55,3 +58,35 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const select = document.getElementById("IdCategoria");
+            const input = document.getElementById("NovaCategoriaNome");
+
+            const toggleNewCategory = () => {
+                const isNew = select?.value === "__nova__";
+                select?.classList.toggle("d-none", isNew);
+                input?.classList.toggle("d-none", !isNew);
+                if (input) {
+                    input.disabled = !isNew;
+                    if (isNew) {
+                        input.focus();
+                    } else {
+                        input.value = "";
+                    }
+                }
+            };
+
+            select?.addEventListener("change", toggleNewCategory);
+            select?.form?.addEventListener("submit", () => {
+                if (select.value === "__nova__") {
+                    select.disabled = true;
+                }
+            });
+            toggleNewCategory();
+        })();
+    </script>
+}

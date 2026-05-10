@@ -1,0 +1,138 @@
+.eh-msg-widget {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1100;
+}
+
+.eh-msg-toggle {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(12, 12, 18, 0.86);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(14px);
+}
+
+.eh-msg-toggle:hover {
+  border-color: rgba(255, 204, 0, 0.6);
+  color: #ffcc00;
+}
+
+.eh-msg-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ffcc00;
+  color: #000;
+  font-size: 0.72rem;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(255, 204, 0, 0.25);
+}
+
+.eh-msg-hidden {
+  display: none !important;
+}
+
+.eh-msg-panel {
+  position: absolute;
+  right: 0;
+  bottom: 66px;
+  width: min(92vw, 360px);
+  max-height: min(62vh, 520px);
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(12, 12, 18, 0.92);
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(16px);
+}
+
+.eh-msg-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.eh-msg-panel-title {
+  font-family: "Courier New", monospace;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.eh-msg-close {
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  padding: 0.25rem 0.4rem;
+  border-radius: 10px;
+}
+
+.eh-msg-close:hover {
+  color: #ffcc00;
+  background: rgba(255, 204, 0, 0.08);
+}
+
+.eh-msg-list {
+  overflow: auto;
+  max-height: calc(min(62vh, 520px) - 54px);
+  padding: 0.5rem;
+}
+
+.eh-msg-empty {
+  padding: 0.9rem 0.9rem;
+  color: rgba(255, 255, 255, 0.65);
+  font-family: "Courier New", monospace;
+  font-size: 0.9rem;
+}
+
+.eh-msg-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.65rem;
+  align-items: start;
+  padding: 0.85rem 0.85rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  margin-bottom: 0.5rem;
+}
+
+.eh-msg-text {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.95rem;
+  line-height: 1.25rem;
+}
+
+.eh-msg-dismiss {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  padding: 0.3rem 0.55rem;
+}
+
+.eh-msg-dismiss:hover {
+  border-color: rgba(255, 204, 0, 0.55);
+  color: #ffcc00;
+  background: rgba(255, 204, 0, 0.08);
+}
+
